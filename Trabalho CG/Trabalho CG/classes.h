@@ -1,9 +1,9 @@
 #include <array>
+#include <vector>
 
 using namespace std;
 
 #define TSIZE 3
-#define MAX_SIZE 100   // CORRIGIR PARA IMPLEMENTAÇÃO SEM LIMITE
 
 class color {
 	float cr;
@@ -69,43 +69,44 @@ public:
 		cor.setColor(r, g, b);
 	}
 
-	triangle* operator =(triangle t) {
+	triangle operator =(triangle t) {
 		triangle aux(t.getP1(), t.getP2(), t.getP3());
 		aux.setColor(t.cor.R(), t.cor.G(), t.cor.B());
-		return &aux;
+		return aux;
 	}
+
+	float getColorR() {	return cor.R(); }
+	float getColorG() { return cor.G(); }
+	float getColorB() { return cor.B(); }
 };
 
 class triangles
 {
-	array<triangle*, MAX_SIZE> triangulos;
-	int pos;
+	vector<triangle> triangulos;
 
 	public:
 
 		triangles() {
-			pos = 0;
-			for (int i = 0; i < MAX_SIZE; i++)
-			{
-				triangle* t = new triangle();
-				triangulos[i] = t;
-			}
 		}
 
-		void addTriangle(triangle* t) {
-			triangulos[pos] = t;
-			pos++;
+		void addTriangle(triangle t) {
+			triangulos.push_back(t);
 		}	
 
-		int getSize(){
-			return pos;
-		}
 
-		triangle * getTriangle(int posicao)
+		triangle getTriangle(int posicao)
 		{
 			return triangulos[posicao];
 		}
 
-		
+		vector<triangle> getTriangulos()
+		{
+			vector<triangle> aux;
+			for (vector<triangle>::iterator it = triangulos.begin(); it != triangulos.end(); ++it)
+			{
+				aux.push_back(*it);
+			}
+			return aux;
+		}
 
 };

@@ -1,4 +1,5 @@
 #include <math.h>
+//#include <vector>
 #include "classes.h"
 #include <GL/glut.h>
 
@@ -11,7 +12,7 @@ float g=1;
 float b=1;
 
 triangles triangulos;
-//triangle a, b;
+
 
 void changeSize(int w, int h) {
 
@@ -41,17 +42,27 @@ void changeSize(int w, int h) {
 
 void iniciaClass()
 {
-	vertex x(-.5, 0.0, 0.5);
-	vertex y(0.5, 0.0, 0.5);
-	vertex z(0.0, 2.0, 0.0);
 
-	triangle t(x, y, z);
-	t.setColor(1, 0, 0);
-	triangle b(y, x, z);
-	b.setColor(0, 1, 0);
-	triangulos.addTriangle(&t);
-	triangulos.addTriangle(&b);
 
+	triangle a(	vertex(-.5, 0.0, 0.5), vertex(0.5, 0.0, 0.5), vertex(0.0, 1.5, 0.0));    // p1 p2 p5
+	a.setColor(0, 1, 0);  // Green
+	triangle b(vertex(0.5, 0.0, 0.5), vertex(0.5, 0.0, -0.5), vertex(0.0, 1.5, 0.0));   // p2 p3 p5
+	b.setColor(1, 0, 0);  // Red
+	triangle c(vertex(0.5, 0.0, -0.5), vertex(-0.5, 0.0, -0.5), vertex(0.0, 1.5, 0.0));  // p3 p4 p5
+	c.setColor(0, 0, 1); // Blue
+	triangle d(vertex(-0.5, 0.0, -0.5), vertex(-.5, 0.0, 0.5), vertex(0.0, 1.5, 0.0));   //p4 p1 p5
+	d.setColor(1, 1, 0);  // yellow
+	triangle e(vertex(-.5, 0.0, 0.5), vertex(0.5, 0.0, -0.5), vertex(0.5, 0.0, 0.5));    // p1 p3 p2
+	e.setColor(0, 1, 1);  // light blue
+	triangle f(vertex(-.5, 0.0, 0.5), vertex(-0.5, 0.0, -0.5), vertex(0.5, 0.0, -0.5));   // p1 p4 p3
+	f.setColor(0, 1, 1);   // light blue
+
+	triangulos.addTriangle(a);
+	triangulos.addTriangle(b);
+	triangulos.addTriangle(c);
+	triangulos.addTriangle(d);
+	triangulos.addTriangle(e);
+	triangulos.addTriangle(f);
 }
 
 void renderScene(void) {
@@ -66,74 +77,27 @@ void renderScene(void) {
 			  0.0f,1.0f,0.0f);
 
 
-	
 	// pôr instruções de desenho aqui
 
 	glRotatef(rotateAng,0,1,0);
-
 	glRotatef(rotateTop,1,0,0);
 
-	iniciaClass();
+
+	// Desenha a estrutura guardada em "triangulos"
+
+	vector<triangle> aux = triangulos.getTriangulos();
 	triangle* a;
-	for (int i = 0; i < 2; i++)
+	for (vector<triangle>::iterator it = aux.begin(); it != aux.end(); ++it)
 	{
-		a = triangulos.getTriangle(i);
+		a = it._Ptr;
 		glBegin(GL_TRIANGLES);
+		glColor3f(a->getColorR(), a->getColorG(), a->getColorB());
 		glVertex3f(a->getP1().getX(), a->getP1().getY(), a->getP1().getZ());
 		glVertex3f(a->getP2().getX(), a->getP2().getY(), a->getP2().getZ());
 		glVertex3f(a->getP3().getX(), a->getP3().getY(), a->getP3().getZ());
 		glEnd();
-
 	}
 	
-	/*
-	glColor3f(0,1,0);  //green
-
-	glBegin(GL_TRIANGLES);
-		glVertex3f(-.5,0.0,0.5);    //p1
-		glVertex3f(0.5,0.0,0.5);	//p2
-		glVertex3f(0.0,alt,0.0);      //p5
-	glEnd();
-
-	glColor3f(1,0,0); //Red
-
-	glBegin(GL_TRIANGLES);
-		glVertex3f(0.5,0.0,0.5);	 //p2
-		glVertex3f(0.5,0.0,-0.5);    //p3
-		glVertex3f(0.0,alt,0.0);       //p5
-	glEnd();
-	
-	glColor3f(0,0,1); //Blue
-
-	glBegin(GL_TRIANGLES);
-		glVertex3f(0.5,0.0,-0.5); 	 //p3
-		glVertex3f(-0.5,0.0,-0.5);    //p4
-		glVertex3f(0.0,alt,0.0);     //p5
-	glEnd();
-
-	glColor3f(1,1,0); //yellow
-
-	glBegin(GL_TRIANGLES);
-		glVertex3f(-0.5,0.0,-0.5);	 //p4
-		glVertex3f(-.5,0.0,0.5);    //p1
-		glVertex3f(0.0,alt,0.0);       //p5
-	glEnd();
-
-	//base
-	glColor3f(r,g,b); //light Blue
-
-	glBegin(GL_TRIANGLES);
-		glVertex3f(-.5,0.0,0.5);	 //p1
-		glVertex3f(0.5,0.0,-0.5);   //p3
-		glVertex3f(0.5,0.0,0.5);       //p2
-	glEnd();
-
-	glBegin(GL_TRIANGLES);
-		glVertex3f(-.5,0.0,0.5);	 //p1
-		glVertex3f(-0.5,0.0,-0.5);    //p4
-		glVertex3f(0.5,0.0,-0.5);      //p3
-	glEnd();
-	*/
 
 	// End of frame
 	glutSwapBuffers();
@@ -229,6 +193,8 @@ int main(int argc, char **argv) {
 	glutCreateWindow("CG@DI-UM");
 	
 
+	// cria piramide
+	iniciaClass();
 
 
 // registo de funções 
