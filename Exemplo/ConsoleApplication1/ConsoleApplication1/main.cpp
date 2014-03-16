@@ -75,7 +75,7 @@ void renderScene(void) {
 		case '1': glColor3f(0,0,1); plano(25.0); break;
 		case '2': cubo(25.0); break;
 		case '3': cilindro(5.0,20.0,12); break;
-		case '4': esfera(13.0,100); break;
+		case '4': esfera(13.0,10); break;
 		case '0': exit(0);
 	}
 	// iniciar nova projeccao (gluOrtho2d) para escrever info no ecra

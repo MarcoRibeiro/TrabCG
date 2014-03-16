@@ -134,7 +134,7 @@ void cilindro(float raio, float altura, int ppc) {
 void esfera(float raio, int complex) {
 	float alfa, beta;
 	float incA = 2*PI/complex;
-	float incB = PI/complex;
+	float incB = PI/30;
 	float x0,xa,xb,x,y0,y,z0,za,zb,z;
 
 	glBegin(GL_TRIANGLES);
