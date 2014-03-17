@@ -1,5 +1,5 @@
-#include <tinystr.h>
-#include <tinyxml.h>
+#include "TinyXml\tinystr.h"
+#include "TinyXml\tinyxml.h"
 
 #include <iostream>
 

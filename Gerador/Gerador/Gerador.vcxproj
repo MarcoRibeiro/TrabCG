@@ -11,9 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C216636C-9E55-4E7D-9A8D-94799FD03D76}</ProjectGuid>
+    <ProjectGuid>{5CDDAD10-CA8B-4A3F-BBA2-34BE855AAE5F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>TrabalhoCG</RootNamespace>
+    <RootNamespace>Gerador</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -53,6 +53,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -69,7 +70,6 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -79,17 +79,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Teste.cpp" />
-    <ClCompile Include="TinyXml\tinystr.cpp" />
-    <ClCompile Include="TinyXml\tinyxml.cpp" />
-    <ClCompile Include="TinyXml\tinyxmlerror.cpp" />
-    <ClCompile Include="TinyXml\tinyxmlparser.cpp" />
+    <ClInclude Include="..\..\Trabalho CG\Trabalho CG\classes.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="classes.h" />
-    <ClInclude Include="TinyXml\tinystr.h" />
-    <ClInclude Include="TinyXml\tinyxml.h" />
+    <ClCompile Include="gerador.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

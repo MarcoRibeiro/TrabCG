@@ -3,10 +3,12 @@
 #include <math.h>
 #include <fstream>
 #include <iostream>
+#include "TinyXml\tinystr.h"
+#include "TinyXml\tinyxml.h"
 #include "classes.h"
 #include <GL/glut.h>
 
-float lookatx=5.0, lookaty=-1.0, lookatz=5.0;
+float lookatx=0, lookaty=0, lookatz=5.0;
 float rotateAng=0.0;
 float rotateTop=0.0;
 float alt=1.0;
@@ -18,6 +20,8 @@ float b=1;
 // class que contem a primitiva
 scene cena;
 primitive triangulos;
+
+
 
 
 void changeSize(int w, int h) {
@@ -45,6 +49,24 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
+primitive drawPlane(float largura, float comprimento)
+{
+	primitive p;
+	float l = largura / 2;
+	float c = comprimento / 2;
+
+	vertex p1(-c,-l, 0);
+	vertex p2( c,-l, 0);
+	vertex p3( c, l, 0);
+	vertex p4(-c, l, 0);
+	triangle t1(p1, p2, p3);	t1.setColor(1, 0, 0);
+	triangle t2(p3, p4, p1);	t2.setColor(1, 0, 0);
+
+	p.addTriangle(t1); 
+	p.addTriangle(t2);
+
+	return p;
+}
 primitive drawCube(float size) {
 	primitive p;
 	float c = size / 2;
@@ -107,7 +129,6 @@ primitive drawCilinder(int n_lados, float altura, float raio)
 	}
 	return p;
 }
-
 primitive drawCone(int n_lados, float altura, float raio)
 {
 	primitive p;
@@ -130,7 +151,9 @@ primitive drawCone(int n_lados, float altura, float raio)
 	return p;
 }
 
-
+/*
+USADA APENAS PARA DEBUG
+*/
 void iniciaClass()
 {
 
@@ -155,6 +178,7 @@ void iniciaClass()
 	triangulos.addTriangle(f);
 }
 
+
 void renderScene(void) {
 
 	// clear buffers
@@ -174,8 +198,7 @@ void renderScene(void) {
 	glRotatef(rotateTop,1,0,0);
 
 
-	// Desenha a estrutura guardada em "triangulos"
-
+	// Desenha as primitivas guardadas em "cena"
 	vector<primitive> c = cena.getPrimitivas();
 	primitive* paux;
 	for (vector<primitive>::iterator iterator = c.begin(); iterator != c.end(); ++iterator)
@@ -198,8 +221,6 @@ void renderScene(void) {
 	// End of frame
 	glutSwapBuffers();
 }
-
-
 
 // escrever função de processamento do teclado
 
@@ -228,7 +249,6 @@ void renderScene(void) {
 		}
 		glutPostRedisplay();
 	}
-
 	void kP(unsigned char codigo, int x, int y)
 	{
 		switch(codigo)
@@ -256,7 +276,6 @@ void renderScene(void) {
 	}
 
 
-
 // escrever função de processamento do menu
 	void menu(int opcao) {
 		switch (opcao)
@@ -278,8 +297,43 @@ void renderScene(void) {
 	}
 
 
+	/*
+	Dado um ficheiro retorna um vector de strings com os ficheiros que contêm os modelos
+	*/
+	vector<string> xmlParse(string file) {
 
-int main(int argc, char **argv) {
+		vector<string> modelos;
+
+		TiXmlDocument doc;
+		doc.LoadFile(file.c_str());
+		TiXmlElement* root = doc.FirstChildElement();
+		const char* attr;
+		string value;
+		for (TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement()){
+			string elemName = elem->Value();
+
+			if (elemName == "modelo")
+			{
+				attr = elem->Attribute("ficheiro");
+				//aqui guarda-se o attr para uma estrutura qq			
+				modelos.push_back(attr);
+			}
+		}
+		return modelos;
+	}
+	/*
+	Dado um ficheiro de modelo carrega os triangulos para a cena
+	*/
+	void carregaModelos(string file)
+	{
+		vector<string> modelos = xmlParse(file);
+		for (vector<string>::iterator it = modelos.begin(); it != modelos.end(); ++it)
+		{
+			cena.addprimitiva(*it);
+		}
+	}
+
+	int main(int argc, char **argv) {
 	
 // inicialização
 	glutInit(&argc, argv);
@@ -289,23 +343,9 @@ int main(int argc, char **argv) {
 	glutCreateWindow("CG@DI-UM");
 	
 
-	// cria piramide
-	//iniciaClass();
-
-	//triangulos.loadFile("teste.txt");
-
-
-	//triangulos = drawCube(1);
-	//triangulos.addTriangulos(drawCone(32, 2, 1).toString());
-	//triangulos.addTriangulos(drawCilinder(32, 3, 0.5).toString());
+	//função que carrega os modelos. deve ser alterada para ler da prompt
+	carregaModelos("ficheiro.xml");
 	
-	cena.addprimitiva(drawCilinder(5, 1, 1));
-	cena.addprimitiva(drawCube(1));
-	cena.addprimitiva(drawCone(32, 2, 1));
-	cena.addprimitiva("teste.txt");
-
-//	triangulos = drawCone(4, 2, 1);
-//	triangulos = drawCilinder(5, 1, 1);
 
 // registo de funções 
 	glutDisplayFunc(renderScene);
