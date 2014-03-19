@@ -145,9 +145,9 @@ void renderScene(void) {
 	glScalef(zoom, zoom, zoom);
 
 	switch (linhas) {
-	case '0': glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
-	case '1': glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
-	case '2': glPolygonMode(GL_FRONT_AND_BACK, GL_POINT); break;
+	case 0: glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
+	case 1: glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
+	case 2: glPolygonMode(GL_FRONT_AND_BACK, GL_POINT); break;
 	}
 
 

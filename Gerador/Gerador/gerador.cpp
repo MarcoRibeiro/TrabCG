@@ -158,7 +158,7 @@ primitive drawSphere(float raio, int fatias, int camadas)
 
 static void show_usage()
 {
-	std::cerr << endl << "Usage: primitiva <options> <filename.txt>" << endl << "cilindro <lados altura raio>" << endl <<
+	std::cerr << endl << "\nUsage: primitiva <options> <filename.txt>\n" << endl << "cilindro <lados altura raio>" << endl <<
 		"cone <lados altura raio>" << endl << "cubo <aresta>" << endl << "paralelipipedo <comprimento largura altura>" << endl <<
 		"plano <comprimento largura>" << endl << "esfera <raio fatias camadas>" << endl;  
 }
@@ -171,8 +171,9 @@ int main(int argc, char **argv) {
 		for (int i = 1; i < argc; ++i) {
 			string arg = argv[i];
 			if (arg == "cilindro"){
+				string err = "\n-- Erro -- Argumentos invalidos\n Usage: cilindro <lados altura raio> <filename>\n";
 				if (argc != 6){
-					std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: esfera <raio camadas fatias> <filename.txt>";
+					std::cerr << err;
 				}
 				else{
 					try{
@@ -185,14 +186,15 @@ int main(int argc, char **argv) {
 					}
 					catch (invalid_argument)
 					{
-						std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: cilindro <lados altura raio> <filename.txt>";
+						std::cerr << err;
 					}
 				}
 				
 			}
 			else if (arg == "cone") {
+				string err = "\n--Erro -- Argumentos invalidos\n Usage: cone <lados altura raio> <filename>\n";
 				if (argc != 6){
-					std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: esfera <raio camadas fatias> <filename.txt>";
+					std::cerr << err;
 				}
 				else{
 					try{
@@ -205,13 +207,14 @@ int main(int argc, char **argv) {
 					}
 					catch (invalid_argument)
 					{
-						std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: cone <lados altura raio> <filename.txt>";
+						std::cerr << err;
 					}
 				}
 			}
 			else if (arg == "cubo") {
-				if (argc != 6){
-					std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: esfera <raio camadas fatias> <filename.txt>";
+				string err = "\n-- Erro -- Argumentos invalidos\nUsage: cubo <aresta> <filename>\n";
+				if (argc != 4){
+					std::cerr << err;
 				}
 				else{
 					try{
@@ -222,13 +225,14 @@ int main(int argc, char **argv) {
 					}
 					catch (invalid_argument)
 					{
-						std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: cubo <aresta> <filename.txt>";
+						std::cerr << err;
 					}
 				}
 			}
 			else if (arg == "paralelipipedo") {
+				string err = "\n-- Erro -- Argumentos invalidos\nUsage: paralelipipedo <comprimento largura altura> <filename>\n";
 				if (argc != 6){
-					std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: esfera <raio camadas fatias> <filename.txt>";
+					std::cerr << err;
 				}
 				else{
 					try{
@@ -241,14 +245,14 @@ int main(int argc, char **argv) {
 					}
 					catch (invalid_argument)
 					{
-						std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: paralelipipedo <largura comprimento altura> <filename.txt>";
+						std::cerr << err;
 					}
 				}
 			}
 			else if (arg == "plano") {
-				
-				if (argc != 6){
-					std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: esfera <raio camadas fatias> <filename.txt>";
+				string err = "\n-- Erro -- Argumentos invalidos\nUsage: plano <comprimento largura> <filename>\n";
+				if (argc != 5){
+					std::cerr << err;
 				}
 				else{
 					try{
@@ -260,13 +264,14 @@ int main(int argc, char **argv) {
 					}
 					catch (invalid_argument)
 					{
-						std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: plano <comprimento largura> <filename.txt>";
+						std::cerr << err;
 					}
 				}
 			}
 			else if (arg == "esfera") {
+				string err = "\n-- Erro -- Argumentos invalidos\nUsage: esfera <raio fatias camadas> <filename>\n";
 				if (argc != 6){
-					std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: esfera <raio camadas fatias> <filename.txt>";
+					std::cerr << err;
 				}else{
 					try{
 						float raio = stof(argv[i + 1]);
@@ -279,8 +284,7 @@ int main(int argc, char **argv) {
 					}
 					catch (invalid_argument)
 					{
-						//cout << e.what();
-						std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: esfera <raio camadas fatias> <filename.txt>";
+						std::cerr << err;
 					}
 				}
 			}
