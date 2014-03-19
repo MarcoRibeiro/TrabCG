@@ -155,34 +155,6 @@ primitive drawSphere(float raio, int fatias, int camadas)
 
 
 
-/*
-USADA APENAS PARA DEBUG
-*/
-void iniciaClass()
-{
-	primitive triangulos;
-
-	triangle a(vertex(-.5, 0.0, 0.5), vertex(0.5, 0.0, 0.5), vertex(0.0, 1.5, 0.0));    // p1 p2 p5
-	a.setColor(0, 1, 0);  // Green
-	triangle b(vertex(0.5, 0.0, 0.5), vertex(0.5, 0.0, -0.5), vertex(0.0, 1.5, 0.0));   // p2 p3 p5
-	b.setColor(1, 0, 0);  // Red
-	triangle c(vertex(0.5, 0.0, -0.5), vertex(-0.5, 0.0, -0.5), vertex(0.0, 1.5, 0.0));  // p3 p4 p5
-	c.setColor(0, 0, 1); // Blue
-	triangle d(vertex(-0.5, 0.0, -0.5), vertex(-.5, 0.0, 0.5), vertex(0.0, 1.5, 0.0));   //p4 p1 p5
-	d.setColor(1, 1, 0);  // yellow
-	triangle e(vertex(-.5, 0.0, 0.5), vertex(0.5, 0.0, -0.5), vertex(0.5, 0.0, 0.5));    // p1 p3 p2
-	e.setColor(0, 1, 1);  // light blue
-	triangle f(vertex(-.5, 0.0, 0.5), vertex(-0.5, 0.0, -0.5), vertex(0.5, 0.0, -0.5));   // p1 p4 p3
-	f.setColor(0, 1, 1);   // light blue
-
-	triangulos.addTriangle(a);
-	triangulos.addTriangle(b);
-	triangulos.addTriangle(c);
-	triangulos.addTriangle(d);
-	triangulos.addTriangle(e);
-	triangulos.addTriangle(f);
-}
-
 
 static void show_usage()
 {
