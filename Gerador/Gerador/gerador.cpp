@@ -1,9 +1,9 @@
-#define _USE_MATH_DEFINES
-
 #include <math.h>
 #include <fstream>
 #include <iostream>
 #include "classes.h"
+
+#define PI 3.14159265358979323846
 
 primitive drawPlane(float largura, float comprimento)
 {
@@ -11,10 +11,10 @@ primitive drawPlane(float largura, float comprimento)
 	float l = largura / 2;
 	float c = comprimento / 2;
 
-	vertex p1(-c, -l, 0);
-	vertex p2(c, -l, 0);
-	vertex p3(c, l, 0);
-	vertex p4(-c, l, 0);
+	vertex p1(-c, 0, l);
+	vertex p2(c, 0, l);
+	vertex p3(c, 0, -l);
+	vertex p4(-c, 0, -l);
 	triangle t1(p1, p2, p3);	t1.setColor(1, 0, 0);
 	triangle t2(p3, p4, p1);	t2.setColor(1, 0, 0);
 
@@ -23,18 +23,19 @@ primitive drawPlane(float largura, float comprimento)
 
 	return p;
 }
-primitive drawCube(float size) {
+primitive drawRectangule(float largura, float comprimento, float altura)
+{
 	primitive p;
-	float c = size / 2;
+	float l = largura / 2, c = comprimento / 2, a = altura / 2;
 
-	vertex p1(-c, c, c);
-	vertex p2(-c, -c, c);
-	vertex p3(c, -c, c);
-	vertex p4(c, c, c);
-	vertex p5(c, c, -c);
-	vertex p6(c, -c, -c);
-	vertex p7(-c, -c, -c);
-	vertex p8(-c, c, -c);
+	vertex p1(-c, a, l);
+	vertex p2(-c, -a, l);
+	vertex p3(c, -a, l);
+	vertex p4(c, a, l);
+	vertex p5(c, a, -l);
+	vertex p6(c, -a, -l);
+	vertex p7(-c, -a, -l);
+	vertex p8(-c, a, -l);
 
 	p.addTriangle(triangle(p1, p2, p4));
 	p.addTriangle(triangle(p2, p3, p4));
@@ -51,10 +52,13 @@ primitive drawCube(float size) {
 
 	return p;
 }
+primitive drawCube(float size) {
+	return drawRectangule(size, size, size);
+}
 primitive drawCilinder(float n_lados, float altura, float raio)
 {
 	primitive p;
-	float delta = 2 * M_PI / n_lados;
+	float delta = 2 * PI / n_lados;
 	for (int count = 0; count < n_lados; count++) {
 
 		//glColor3f(1, 0, 0);
@@ -88,7 +92,7 @@ primitive drawCilinder(float n_lados, float altura, float raio)
 primitive drawCone(float n_lados, float altura, float raio)
 {
 	primitive p;
-	float delta = 2 * M_PI / n_lados;
+	float delta = 2 * PI / n_lados;
 	for (int count = 0; count < n_lados; count++) {
 		vertex a(0, -altura / 2, 0);  //O
 		vertex b(raio*sin((delta)*(count + 1)), -altura / 2, raio*cos((delta)*(count + 1)));  //Q
@@ -106,11 +110,57 @@ primitive drawCone(float n_lados, float altura, float raio)
 	}
 	return p;
 }
+primitive drawSphere(float raio, int camadas, int fatias)
+{
+	primitive p;
+	float alfa, beta;
+	float incA = 2 * PI / camadas;
+	float incB = PI / fatias;
+	float x0, xa, xb, x, y0, y, z0, za, zb, z;
 
-primitive triangulos;
+	for (alfa = 0.0; alfa < 2 * PI; alfa += incA) {
+		for (beta = -PI / 2; beta < PI / 2; beta += incB) {
 
+			x0 = raio*cos(beta)*sin(alfa);
+			xa = raio*cos(beta)*sin(alfa + incA);
+			xb = raio*cos(beta + incB)*sin(alfa);
+			x = raio*cos(beta + incB)*sin(alfa + incA);
+
+			y0 = raio*sin(beta);
+			y = raio*sin(beta + incB);
+
+			z0 = raio*cos(beta)*cos(alfa);
+			za = raio*cos(beta)*cos(alfa + incA);
+			zb = raio*cos(beta + incB)*cos(alfa);
+			z = raio*cos(beta + incB)*cos(alfa + incA);
+
+			vertex b(xb, y, zb);
+			vertex c(x0, y0, z0);
+			vertex d(xa, y0, za);
+
+			vertex f(xa, y0, za);
+			vertex g(x, y, z);
+			vertex h(xb, y, zb);
+
+			triangle t1(b, c, d); t1.setColor(0.5, 0, 0);
+			triangle t2(f, g, h); t2.setColor(1, 0, 0);
+
+			p.addTriangle(t1);
+			p.addTriangle(t2);
+		}
+	}
+	return p;
+}
+
+
+
+
+/*
+USADA APENAS PARA DEBUG
+*/
 void iniciaClass()
 {
+	primitive triangulos;
 
 	triangle a(vertex(-.5, 0.0, 0.5), vertex(0.5, 0.0, 0.5), vertex(0.0, 1.5, 0.0));    // p1 p2 p5
 	a.setColor(0, 1, 0);  // Green
@@ -136,15 +186,14 @@ void iniciaClass()
 
 static void show_usage()
 {
-	std::cerr << "Usage: primitiva <options> <destiny file>" << endl << "cilindro (lados altura raio)" << endl <<
-		"cone (lados altura raio" << endl << "cubo (aresta)" << endl << "plano (comprimento largura)" << endl;
+	std::cerr << endl << "Usage: primitiva <options> <filename.txt>" << endl << "cilindro <lados altura raio>" << endl <<
+		"cone <lados altura raio>" << endl << "cubo <aresta>" << endl << "paralelipipedo <largura comprimento altura>" << endl <<
+		"plano <comprimento largura>" << endl << "esfera <raio camadas fatias>" << endl;  
 }
 
 int main(int argc, char **argv) {
 	primitive p;
 
-	vector <string> sources;
-	string destination;
 	if (argc == 1) show_usage();
 	else
 	{
@@ -172,6 +221,14 @@ int main(int argc, char **argv) {
 				p = drawCube(aresta);
 				p.saveFile(file);
 			}
+			else if (arg == "paralelipipedo") {
+				float largura = stof(argv[i + 1]);
+				float comprimento = stof(argv[i + 2]);
+				float altura = stof(argv[i + 3]);
+				string file = argv[i + 4];
+				p = drawRectangule(largura,comprimento,altura);
+				p.saveFile(file);
+			}
 			else if (arg == "plano") {
 				float largura = stof(argv[i + 1]);
 				float comprimento = stof(argv[i + 2]);
@@ -179,8 +236,14 @@ int main(int argc, char **argv) {
 				p = drawPlane(largura, comprimento);
 				p.saveFile(file);
 			}
+			else if (arg == "esfera") {
+				float raio = stof(argv[i + 1]);
+				float camadas = stof(argv[i + 2]);
+				float fatias = stof(argv[i + 3]);
+				string file = argv[i + 4];
+				p = drawSphere(raio, camadas, fatias);
+				p.saveFile(file);
+			}
 		}
 	}
 }	
-
-

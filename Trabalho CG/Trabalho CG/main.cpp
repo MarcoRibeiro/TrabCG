@@ -8,20 +8,21 @@
 #include "classes.h"
 #include <GL/glut.h>
 
-float lookatx=0, lookaty=0, lookatz=5.0;
+float lookatx=0, lookaty=0, lookatz=5.0; // Não usado
 float rotateAng=0.0;
 float rotateTop=0.0;
-float alt=1.0;
-float r=0;
-float g=1;
-float b=1;
+
+bool linhas = false;  // usado para o menu
+
+
+float raiocamara = 5;  // raio rotação
+float alfa = 0;  // usado para rotação da câmara
+float beta = 0;  // usado para rotação da câmara
+
 
 
 // class que contem a primitiva
 scene cena;
-primitive triangulos;
-
-
 
 
 void changeSize(int w, int h) {
@@ -49,156 +50,9 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-primitive drawPlane(float largura, float comprimento)
+
+void drawScene()
 {
-	primitive p;
-	float l = largura / 2;
-	float c = comprimento / 2;
-
-	vertex p1(-c,-l, 0);
-	vertex p2( c,-l, 0);
-	vertex p3( c, l, 0);
-	vertex p4(-c, l, 0);
-	triangle t1(p1, p2, p3);	t1.setColor(1, 0, 0);
-	triangle t2(p3, p4, p1);	t2.setColor(1, 0, 0);
-
-	p.addTriangle(t1); 
-	p.addTriangle(t2);
-
-	return p;
-}
-primitive drawCube(float size) {
-	primitive p;
-	float c = size / 2;
-
-	vertex p1(-c, c, c);
-	vertex p2(-c,-c, c);
-	vertex p3( c,-c, c);
-	vertex p4( c, c, c);
-	vertex p5( c, c,-c);
-	vertex p6( c,-c,-c);
-	vertex p7(-c,-c,-c);
-	vertex p8(-c, c,-c);
-
-	p.addTriangle(triangle(p1,p2,p4));
-	p.addTriangle(triangle(p2,p3,p4));
-	p.addTriangle(triangle(p4,p3,p5));
-	p.addTriangle(triangle(p3,p6,p5));
-	p.addTriangle(triangle(p1,p4,p5));
-	p.addTriangle(triangle(p1,p5,p8));
-	p.addTriangle(triangle(p8,p7,p2));
-	p.addTriangle(triangle(p2,p1,p8));
-	p.addTriangle(triangle(p8,p5,p6));
-	p.addTriangle(triangle(p6,p7,p8));
-	p.addTriangle(triangle(p2,p7,p6));
-	p.addTriangle(triangle(p6,p3,p2));
-
-	return p;
-}
-primitive drawCilinder(int n_lados, float altura, float raio)
-{
-	primitive p;
-	float delta = 2 * M_PI / n_lados;
-	for (int count = 0; count < n_lados; count++) {
-
-		//glColor3f(1, 0, 0);
-
-		vertex a(0, altura / 2, 0);  //O
-		vertex b(raio*sin((delta)*(count)), altura / 2, raio*cos((delta)*(count))); //P
-		vertex c(raio*sin((delta)*(count + 1)), altura / 2, raio*cos((delta)*(count + 1)));  //Q
-
-		//glColor3f(0, 1, 0);
-		vertex d(raio*sin((delta)*(count)), altura / 2, raio*cos((delta)*(count))); //P
-		vertex e(raio*sin((delta)*(count)), -altura / 2, raio*cos((delta)*(count)));  //P'
-		vertex f(raio*sin((delta)*(count + 1)), altura / 2, raio*cos((delta)*(count + 1)));  //Q
-
-		vertex g(raio*sin((delta)*(count + 1)), altura / 2, raio*cos((delta)*(count + 1)));  //Q
-		vertex h(raio*sin((delta)*(count)), -altura / 2, raio*cos((delta)*(count)));  //P'
-		vertex i(raio*sin((delta)*(count + 1)), -altura / 2, raio*cos((delta)*(count + 1)));  // Q'
-
-		//glColor3f(1, 0, 0);
-		vertex j(0, -altura / 2, 0);  // O'
-		vertex k(raio*sin((delta)*(count + 1)), -altura / 2, raio*cos((delta)*(count + 1)));  // Q'
-		vertex l(raio*sin((delta)*(count)), -altura / 2, raio*cos((delta)*(count)));  //P'
-
-		triangle t1(a, b, c); t1.setColor(1, 0, 0);
-		triangle t2(d, e, f); t2.setColor(0, 1, 0);
-		triangle t3(g, h, i); t3.setColor(0, 1, 0);
-		triangle t4(j, k, l); t4.setColor(1, 0, 0);
-		p.addTriangle(t1); p.addTriangle(t2); p.addTriangle(t3); p.addTriangle(t4);
-	}
-	return p;
-}
-primitive drawCone(int n_lados, float altura, float raio)
-{
-	primitive p;
-	float delta = 2 * M_PI / n_lados;
-	for (int count = 0; count < n_lados; count++) {
-		vertex a (0, -altura / 2, 0);  //O
-		vertex b (raio*sin((delta)*(count + 1)), -altura / 2, raio*cos((delta)*(count + 1)));  //Q
-		vertex c (raio*sin((delta)*(count)), -altura / 2, raio*cos((delta)*(count))); //P
-		
-		vertex d (0, altura / 2, 0);  //O
-		vertex e (raio*sin((delta)*(count)), -altura / 2, raio*cos((delta)*(count))); //P
-		vertex f (raio*sin((delta)*(count + 1)), -altura / 2, raio*cos((delta)*(count + 1)));  //Q
-
-		triangle t1(a, b, c);	t1.setColor(1, 0, 0);
-		triangle t2(d, e, f);	t2.setColor(0.5, 0, 0);
-
-		p.addTriangle(t1);
-		p.addTriangle(t2);
-	}
-	return p;
-}
-
-/*
-USADA APENAS PARA DEBUG
-*/
-void iniciaClass()
-{
-
-	triangle a(	vertex(-.5, 0.0, 0.5), vertex(0.5, 0.0, 0.5), vertex(0.0, 1.5, 0.0));    // p1 p2 p5
-	a.setColor(0,1, 0);  // Green
-	triangle b(vertex(0.5, 0.0, 0.5), vertex(0.5, 0.0, -0.5), vertex(0.0, 1.5, 0.0));   // p2 p3 p5
-	b.setColor(1, 0, 0);  // Red
-	triangle c(vertex(0.5, 0.0, -0.5), vertex(-0.5, 0.0, -0.5), vertex(0.0, 1.5, 0.0));  // p3 p4 p5
-	c.setColor(0, 0, 1); // Blue
-	triangle d(vertex(-0.5, 0.0, -0.5), vertex(-.5, 0.0, 0.5), vertex(0.0, 1.5, 0.0));   //p4 p1 p5
-	d.setColor(1, 1, 0);  // yellow
-	triangle e(vertex(-.5, 0.0, 0.5), vertex(0.5, 0.0, -0.5), vertex(0.5, 0.0, 0.5));    // p1 p3 p2
-	e.setColor(0, 1, 1);  // light blue
-	triangle f(vertex(-.5, 0.0, 0.5), vertex(-0.5, 0.0, -0.5), vertex(0.5, 0.0, -0.5));   // p1 p4 p3
-	f.setColor(0, 1, 1);   // light blue
-
-	triangulos.addTriangle(a);
-	triangulos.addTriangle(b);
-	triangulos.addTriangle(c);
-	triangulos.addTriangle(d);
-	triangulos.addTriangle(e);
-	triangulos.addTriangle(f);
-}
-
-
-void renderScene(void) {
-
-	// clear buffers
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// set the camera
-	glLoadIdentity();
-	gluLookAt(lookatx,lookaty,lookatz, 
-		      0.0,0.0,0.0,
-			  0.0f,1.0f,0.0f);
-
-
-	// pôr instruções de desenho aqui
-
-	glRotatef(rotateAng,0,1,0);
-	glRotatef(rotateTop,1,0,0);
-
-
-	// Desenha as primitivas guardadas em "cena"
 	vector<primitive> c = cena.getPrimitivas();
 	primitive* paux;
 	for (vector<primitive>::iterator iterator = c.begin(); iterator != c.end(); ++iterator)
@@ -217,6 +71,33 @@ void renderScene(void) {
 			glEnd();
 		}
 	}
+}
+
+
+void renderScene(void) {
+
+	// clear buffers
+	if (linhas==true)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// set the camera
+	glLoadIdentity();
+	gluLookAt(raiocamara*cos(beta)*sin(alfa), raiocamara*sin(beta), raiocamara*cos(beta)*cos(alfa),
+		0.0, 0.0, 0.0,
+		0.0f, 1.0f, 0.0f);
+
+
+	// pôr instruções de desenho aqui
+
+	glRotatef(rotateAng,0,1,0);
+	glRotatef(rotateTop,1,0,0);
+
+	// Realiza o deseho conforme class cena
+	drawScene();
 
 	// End of frame
 	glutSwapBuffers();
@@ -224,7 +105,7 @@ void renderScene(void) {
 
 // escrever função de processamento do teclado
 
-	void sK(int codigo, int x, int y)
+void sK(int codigo, int x, int y)
 	{
 		switch(codigo)
 		{
@@ -235,21 +116,23 @@ void renderScene(void) {
 			lookatx=lookatx-0.3;
 			break;
 		case GLUT_KEY_RIGHT:
-			rotateAng=rotateAng+10;
+			alfa = alfa + 0.087;
 			break;
 		case GLUT_KEY_LEFT:
-			rotateAng=rotateAng-10;
+			alfa = alfa - 0.087;
 			break;
 		case GLUT_KEY_UP:
-			rotateTop=rotateTop+10;
+			if (beta < 1.5) 
+				beta = beta + 0.087;  // 5 graus 
 			break;
 		case GLUT_KEY_DOWN:
-			rotateTop=rotateTop-10;
+			if (beta > -1.5)
+				beta = beta - 0.087;  // 5 graus
 			break;
 		}
 		glutPostRedisplay();
 	}
-	void kP(unsigned char codigo, int x, int y)
+void kP(unsigned char codigo, int x, int y)
 	{
 		switch(codigo)
 		{
@@ -265,42 +148,30 @@ void renderScene(void) {
 		case 's':
 			lookaty=lookaty-0.3;
 			break;
-		case 'r':
-			alt=alt+0.3;
-			break;
-		case 'f':
-			alt=alt-0.3;
-			break;
 		}
 		glutPostRedisplay();
 	}
 
 
 // escrever função de processamento do menu
-	void menu(int opcao) {
+void menu(int opcao) {
 		switch (opcao)
 		{
 		case 1:
-			r=1; g=0; b=0;
+			linhas = true;
 			break;
 		case 2:
-			r=0; g=0; b=1;
-			break;
-		case 3:
-			r=0; g=1; b=0;
-			break;
-		case 4:
-			r=0; g=1; b=1;
+			linhas = false;
 			break;
 		}
 		glutPostRedisplay();
 	}
 
 
-	/*
+/*
 	Dado um ficheiro retorna um vector de strings com os ficheiros que contêm os modelos
 	*/
-	vector<string> xmlParse(string file) {
+vector<string> xmlParse(string file) {
 
 		vector<string> modelos;
 
@@ -321,10 +192,10 @@ void renderScene(void) {
 		}
 		return modelos;
 	}
-	/*
+/*
 	Dado um ficheiro de modelo carrega os triangulos para a cena
 	*/
-	void carregaModelos(string file)
+void carregaModelos(string file)
 	{
 		vector<string> modelos = xmlParse(file);
 		for (vector<string>::iterator it = modelos.begin(); it != modelos.end(); ++it)
@@ -333,19 +204,24 @@ void renderScene(void) {
 		}
 	}
 
-	int main(int argc, char **argv) {
-	
+int main(int argc, char **argv) {
+	string file;
+
+	if (argc > 1)
+		file = argv[1];
+	else
+		file = "ficheiro.xml";
+
+	carregaModelos(file);
+
 // inicialização
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
 	glutInitWindowPosition(100,100);
 	glutInitWindowSize(800,800);
-	glutCreateWindow("CG@DI-UM");
+	glutCreateWindow("Motor 3D@CG");
 	
 
-	//função que carrega os modelos. deve ser alterada para ler da prompt
-	carregaModelos("ficheiro.xml");
-	
 
 // registo de funções 
 	glutDisplayFunc(renderScene);
@@ -359,10 +235,8 @@ void renderScene(void) {
 
 // pôr aqui a criação do menu
 	int i = glutCreateMenu(menu);
-	glutAddMenuEntry("Vermelho",1);
-	glutAddMenuEntry("Azul",2);
-	glutAddMenuEntry("Verde",3);
-	glutAddMenuEntry("Azul Claro",4);
+	glutAddMenuEntry("Linhas",1);
+	glutAddMenuEntry("Opaco",2);
 
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
