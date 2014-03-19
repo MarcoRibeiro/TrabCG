@@ -275,6 +275,7 @@ int main(int argc, char **argv) {
 						string file = argv[i + 4];
 						p = drawSphere(raio, camadas, fatias);
 						p.saveFile(file);
+
 					}
 					catch (invalid_argument)
 					{
