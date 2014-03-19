@@ -23,7 +23,7 @@ primitive drawPlane(float largura, float comprimento)
 
 	return p;
 }
-primitive drawRectangule(float largura, float comprimento, float altura)
+primitive drawRectangule( float comprimento, float largura, float altura)
 {
 	primitive p;
 	float l = largura / 2, c = comprimento / 2, a = altura / 2;
@@ -110,7 +110,7 @@ primitive drawCone(float n_lados, float altura, float raio)
 	}
 	return p;
 }
-primitive drawSphere(float raio, int camadas, int fatias)
+primitive drawSphere(float raio, int fatias, int camadas)
 {
 	primitive p;
 	float alfa, beta;
@@ -187,62 +187,129 @@ void iniciaClass()
 static void show_usage()
 {
 	std::cerr << endl << "Usage: primitiva <options> <filename.txt>" << endl << "cilindro <lados altura raio>" << endl <<
-		"cone <lados altura raio>" << endl << "cubo <aresta>" << endl << "paralelipipedo <largura comprimento altura>" << endl <<
-		"plano <comprimento largura>" << endl << "esfera <raio camadas fatias>" << endl;  
+		"cone <lados altura raio>" << endl << "cubo <aresta>" << endl << "paralelipipedo <comprimento largura altura>" << endl <<
+		"plano <comprimento largura>" << endl << "esfera <raio fatias camadas>" << endl;  
 }
 
 int main(int argc, char **argv) {
 	primitive p;
 
 	if (argc == 1) show_usage();
-	else
-	{
+	else {
 		for (int i = 1; i < argc; ++i) {
 			string arg = argv[i];
 			if (arg == "cilindro"){
-				float n_lados = stof(argv[i + 1]);
-				float altura = stof(argv[i + 2]);
-				float raio = stof(argv[i + 3]);
-				string file = argv[i + 4];
-				p = drawCilinder(n_lados, altura, raio);
-				p.saveFile(file);
+				if (argc != 6){
+					std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: esfera <raio camadas fatias> <filename.txt>";
+				}
+				else{
+					try{
+						float n_lados = stof(argv[i + 1]);
+						float altura = stof(argv[i + 2]);
+						float raio = stof(argv[i + 3]);
+						string file = argv[i + 4];
+						p = drawCilinder(n_lados, altura, raio);
+						p.saveFile(file);
+					}
+					catch (invalid_argument)
+					{
+						std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: cilindro <lados altura raio> <filename.txt>";
+					}
+				}
+				
 			}
 			else if (arg == "cone") {
-				float n_lados = stof(argv[i + 1]);
-				float altura = stof(argv[i + 2]);
-				float raio = stof(argv[i + 3]);
-				string file = argv[i + 4];
-				p = drawCone(n_lados, altura, raio);
-				p.saveFile(file);
+				if (argc != 6){
+					std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: esfera <raio camadas fatias> <filename.txt>";
+				}
+				else{
+					try{
+						float n_lados = stof(argv[i + 1]);
+						float altura = stof(argv[i + 2]);
+						float raio = stof(argv[i + 3]);
+						string file = argv[i + 4];
+						p = drawCone(n_lados, altura, raio);
+						p.saveFile(file);
+					}
+					catch (invalid_argument)
+					{
+						std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: cone <lados altura raio> <filename.txt>";
+					}
+				}
 			}
 			else if (arg == "cubo") {
-				float aresta = stof(argv[i + 1]);
-				string file = argv[i + 2];
-				p = drawCube(aresta);
-				p.saveFile(file);
+				if (argc != 6){
+					std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: esfera <raio camadas fatias> <filename.txt>";
+				}
+				else{
+					try{
+						float aresta = stof(argv[i + 1]);
+						string file = argv[i + 2];
+						p = drawCube(aresta);
+						p.saveFile(file);
+					}
+					catch (invalid_argument)
+					{
+						std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: cubo <aresta> <filename.txt>";
+					}
+				}
 			}
 			else if (arg == "paralelipipedo") {
-				float largura = stof(argv[i + 1]);
-				float comprimento = stof(argv[i + 2]);
-				float altura = stof(argv[i + 3]);
-				string file = argv[i + 4];
-				p = drawRectangule(largura,comprimento,altura);
-				p.saveFile(file);
+				if (argc != 6){
+					std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: esfera <raio camadas fatias> <filename.txt>";
+				}
+				else{
+					try{
+						float largura = stof(argv[i + 1]);
+						float comprimento = stof(argv[i + 2]);
+						float altura = stof(argv[i + 3]);
+						string file = argv[i + 4];
+						p = drawRectangule(largura, comprimento, altura);
+						p.saveFile(file);
+					}
+					catch (invalid_argument)
+					{
+						std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: paralelipipedo <largura comprimento altura> <filename.txt>";
+					}
+				}
 			}
 			else if (arg == "plano") {
-				float largura = stof(argv[i + 1]);
-				float comprimento = stof(argv[i + 2]);
-				string file = argv[i + 3];
-				p = drawPlane(largura, comprimento);
-				p.saveFile(file);
+				
+				if (argc != 6){
+					std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: esfera <raio camadas fatias> <filename.txt>";
+				}
+				else{
+					try{
+						float largura = stof(argv[i + 1]);
+						float comprimento = stof(argv[i + 2]);
+						string file = argv[i + 3];
+						p = drawPlane(largura, comprimento);
+						p.saveFile(file);
+					}
+					catch (invalid_argument)
+					{
+						std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: plano <comprimento largura> <filename.txt>";
+					}
+				}
 			}
 			else if (arg == "esfera") {
-				float raio = stof(argv[i + 1]);
-				float camadas = stof(argv[i + 2]);
-				float fatias = stof(argv[i + 3]);
-				string file = argv[i + 4];
-				p = drawSphere(raio, camadas, fatias);
-				p.saveFile(file);
+				if (argc != 6){
+					std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: esfera <raio camadas fatias> <filename.txt>";
+				}else{
+					try{
+						float raio = stof(argv[i + 1]);
+						float camadas = stof(argv[i + 2]);
+						float fatias = stof(argv[i + 3]);
+						string file = argv[i + 4];
+						p = drawSphere(raio, camadas, fatias);
+						p.saveFile(file);
+					}
+					catch (invalid_argument)
+					{
+						//cout << e.what();
+						std::cerr << "-- Erro -- Argumentos invalidos" << endl << "Usage: esfera <raio camadas fatias> <filename.txt>";
+					}
+				}
 			}
 		}
 	}
