@@ -1,0 +1,7 @@
+<cena>
+<modelo ficheiro=esfera.txt />
+<modelo ficheiro=cone.txt />
+<modelo ficheiro=cilindro.txt />
+<modelo ficheiro=plano.3d />
+<modelo ficheiro=cubo.txt />
+</cena>

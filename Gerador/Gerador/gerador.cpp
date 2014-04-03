@@ -15,8 +15,8 @@ primitive drawPlane(float largura, float comprimento)
 	vertex p2(c, 0, l);
 	vertex p3(c, 0, -l);
 	vertex p4(-c, 0, -l);
-	triangle t1(p1, p2, p3);	t1.setColor(1, 0, 0);
-	triangle t2(p3, p4, p1);	t2.setColor(1, 0, 0);
+	triangle t1(p1, p2, p3);	t1.setColor(1, 1, 0);
+	triangle t2(p3, p4, p1);	t2.setColor(1, 1, 0);
 
 	p.addTriangle(t1);
 	p.addTriangle(t2);
@@ -102,8 +102,8 @@ primitive drawCone(float n_lados, float altura, float raio)
 		vertex e(raio*sin((delta)*(count)), -altura / 2, raio*cos((delta)*(count))); //P
 		vertex f(raio*sin((delta)*(count + 1)), -altura / 2, raio*cos((delta)*(count + 1)));  //Q
 
-		triangle t1(a, b, c);	t1.setColor(1, 0, 0);
-		triangle t2(d, e, f);	t2.setColor(0.5, 0, 0);
+		triangle t1(a, b, c);	t1.setColor(0, 0, 1);
+		triangle t2(d, e, f);	t2.setColor(0, 0, 1);
 
 		p.addTriangle(t1);
 		p.addTriangle(t2);

@@ -1,3 +1,28 @@
 <cena>
-<modelo ficheiro=modelos\cone.txt />
+	<grupo>
+		<translacao X=1/>
+		<modelos>
+			<modelo ficheiro=cubo.txt />
+		</modelos>
+		<grupo>
+			<translacao X=-1 Y=1 />
+			<modelos>
+				<modelo ficheiro=cubo.txt />
+				<modelo ficheiro=big_esfera.txt />
+			</modelos>
+		</grupo>
+		<grupo>
+			<rotacao angulo=90 eixoZ=1 />
+			<modelos>
+				<modelo ficheiro=cone.txt />
+			</modelos>
+		</grupo>
+	</grupo>
+	<grupo>
+		<translacao Z=-1 />
+		<rotacao angulo=90 eixoX=1 />
+		<modelos>
+			<modelo ficheiro=plano.txt />
+		</modelos>
+	</grupo>
 </cena>

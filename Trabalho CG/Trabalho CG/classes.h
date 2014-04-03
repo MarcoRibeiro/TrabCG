@@ -2,10 +2,18 @@
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <GL/glut.h>
+
+
 
 using namespace std;
 
 #define TSIZE 3
+
+#define TYPE_TRANSLACAO 1
+#define TYPE_ROTACAO 2
+#define TYPE_ESCALA 3
+
 
 class color {
 	float cr;
@@ -28,6 +36,94 @@ public:
 		return ss.str();
 	}
 };
+
+
+class drawable {
+public:
+
+	virtual void draw()	{ }
+};
+
+
+// Classe base das transformações geométricas
+class transf : public drawable {
+	float Pontox=0, Pontoy=0, Pontoz=0, ang=0;
+	int tipo;
+public:
+	void set_values(float px, float py, float pz, short type)
+	{
+		Pontox = px;
+		Pontoy = py;
+		Pontoz = pz;
+		tipo = type;
+	}
+	void set_angulo(float angulo) { ang = angulo; }
+
+	float x() { return Pontox; }
+	float y() { return Pontoy; }
+	float z() { return Pontoz; }
+	int type() { return tipo; }
+	float angulo() { return ang; } // tentar melhorar de forma que o angulo apenas faca parte da class rotacao
+};
+
+class ppMatrix : public transf {
+	
+public:
+	ppMatrix() {}
+
+	void draw()	{
+		glPopMatrix();
+	}
+};
+
+class psMatrix : public transf {
+	
+public:
+	psMatrix() 	{	}
+
+	void draw() {
+		glPushMatrix();
+	}
+};
+
+class translacao : public transf {
+
+public:
+	translacao(float px, float py, float pz) {
+		set_values(px, py, pz, TYPE_TRANSLACAO);
+	}
+
+	void draw(){
+		glTranslatef(transf::x(), transf::y(), transf::z());
+	}
+};
+
+class rotacao : public transf {
+
+public:
+	rotacao(float angulo, float eixoX, float eixoY, float eixoZ)
+	{
+		set_values(eixoX, eixoY, eixoZ, TYPE_ROTACAO);
+		set_angulo(angulo);
+	}
+	void draw(){
+		glRotatef(transf::angulo(),transf::x(), transf::y(), transf::z());
+	}
+};
+
+class escala : public transf {
+
+public:
+	escala(float px, float py, float pz)
+	{
+		set_values(px, py, pz, TYPE_ESCALA);
+	}
+	void draw(){
+		glTranslatef(transf::x(), transf::y(), transf::z());
+	}
+};
+
+// Fim da implementação das transformações
 
 class vertex {
 	float px;
@@ -58,8 +154,6 @@ public:
 		vertex temp(x, y, z);
 		return temp;
 	}
-
-
 };
 
 class triangle {
@@ -101,7 +195,7 @@ public:
 	}
 };
 
-class primitive
+class primitive : public drawable
 {
 	vector<triangle> triangulos;
 
@@ -110,15 +204,13 @@ class primitive
 		primitive() {
 		}
 
+		primitive(string file) {
+			loadFile(file);
+		}
+
 		void addTriangle(triangle t) {
 			triangulos.push_back(t);
 		}	
-
-
-		triangle getTriangle(int posicao)
-		{
-			return triangulos[posicao];
-		}
 
 		vector<triangle> getTriangulos()
 		{
@@ -130,17 +222,18 @@ class primitive
 			return aux;
 		}
 
+		//Usado para guardar primitivas
 		string toString()
 		{
 			stringstream ss(stringstream::in | stringstream::out);
-			//ss << triangulos.size() << endl;
 			for (vector<triangle>::iterator it = triangulos.begin(); it != triangulos.end(); ++it)
 			{
-			ss	<< it._Ptr->toString() << endl;
+				ss	<< it._Ptr->toString() << endl;
 			}
 			return ss.str();
 		}
 
+		// Leitura de ficheiros com primitivas
 		void addTriangle(string str)
 		{
 			stringstream ss(stringstream::in | stringstream::out);
@@ -197,10 +290,9 @@ class primitive
 			addTriangle(t);
 
 		}
-
 		void addTriangulos(string str)
 		{
-			string parsed;// , input = "text to be parsed";
+			string parsed;
 			stringstream input_stringstream(str);
 			stringstream ss(stringstream::in | stringstream::out);
 
@@ -212,7 +304,6 @@ class primitive
 			}
 			int f = 0;
 		}
-
 		int loadFile(string file)  // retorna 1 caso leitura com sucesso 0 se falha
 		{
 			stringstream content(stringstream::in | stringstream::out);
@@ -230,8 +321,7 @@ class primitive
 			addTriangulos(content.str());
 
 			return 1;
-		}
-		
+		}	
 		int saveFile(string file)
 		{
 			ofstream f(file);
@@ -244,12 +334,49 @@ class primitive
 
 			return 1;
 		}
+		
+
+		//Imprime em OpenGL
+		void draw(){
+			for (vector<triangle>::iterator it = triangulos.begin(); it != triangulos.end(); ++it)
+			{
+				triangle* a = it._Ptr;
+				glBegin(GL_TRIANGLES);
+				glColor3f(a->getColorR(), a->getColorG(), a->getColorB());
+				glVertex3f(a->getP1().getX(), a->getP1().getY(), a->getP1().getZ());
+				glVertex3f(a->getP2().getX(), a->getP2().getY(), a->getP2().getZ());
+				glVertex3f(a->getP3().getX(), a->getP3().getY(), a->getP3().getZ());
+				glEnd();
+			}
+		}
 };
 
+
+
+class cena {
+	vector<drawable*> itens;
+
+public:
+	cena() {
+	}
+
+	void addPrimitiva(primitive* p) {
+		itens.push_back(p);
+	}
+	void addTransf(transf* t) {
+		itens.push_back(t);
+	}
+	vector<drawable*> getItens() {
+		return itens;
+	}
+};
+
+
+
+//OBSOLETO
 class scene {
 	vector<primitive> primitivas;
 public:
-
 
 	void addprimitiva(primitive p)
 	{
@@ -263,11 +390,13 @@ public:
 	}
 	vector<primitive> getPrimitivas()
 	{
+		/*
 		vector<primitive> aux;
 		for (vector<primitive>::iterator it = primitivas.begin(); it != primitivas.end(); ++it)
 		{
 			aux.push_back(*it);
 		}
-		return aux;
+		return aux;*/
+		return primitivas;
 	}
 };
