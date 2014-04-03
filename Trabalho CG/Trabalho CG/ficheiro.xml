@@ -1,28 +1,38 @@
 <cena>
 	<grupo>
-		<translacao X=1/>
-		<modelos>
-			<modelo ficheiro=cubo.txt />
-		</modelos>
+		<translacao Y=-1 />
 		<grupo>
-			<translacao X=-1 Y=1 />
+			<translacao X=1/>
 			<modelos>
 				<modelo ficheiro=cubo.txt />
-				<modelo ficheiro=big_esfera.txt />
+			</modelos>
+			<grupo>
+				<translacao X=-1 Y=1 />
+				<modelos>
+					<modelo ficheiro=cubo.txt />
+					<modelo ficheiro=big_esfera.txt />
+				</modelos>
+			</grupo>
+			<grupo>
+				<rotacao angulo=90 eixoZ=1 />
+				<modelos>
+					<modelo ficheiro=cone.txt />
+				</modelos>
+			</grupo>
+		</grupo>
+		<grupo>
+			<translacao Z=-1 />
+			<rotacao angulo=90 eixoX=1 />
+			<modelos>
+				<modelo ficheiro=plano.txt />
 			</modelos>
 		</grupo>
 		<grupo>
-			<rotacao angulo=90 eixoZ=1 />
+			<translacao Y=1.5 />
+
 			<modelos>
-				<modelo ficheiro=cone.txt />
+				<modelo ficheiro=telhado.txt />
 			</modelos>
 		</grupo>
-	</grupo>
-	<grupo>
-		<translacao Z=-1 />
-		<rotacao angulo=90 eixoX=1 />
-		<modelos>
-			<modelo ficheiro=plano.txt />
-		</modelos>
 	</grupo>
 </cena>
