@@ -1,0 +1,26 @@
+<cena>
+	<grupo>
+		<translacao X=1 />
+		
+		<modelos>
+			<modelo ficheiro=esf.txt />
+		</modelos>
+	
+		<grupo>
+			<rotacao angulo=10 eixoY=1 eixoX=0 eixoZ=0 />
+			
+			<modelos>
+				<modelo ficheiro=cubo.txt />
+			</modelos>
+			
+		</grupo>
+		
+	</grupo>
+	<grupo>
+		<escala X=0.5 Y=0.5 Z=1 />
+		<translacao Z=1 />
+		<modelos>
+			<modelo ficheiro=cone.txt />
+		</modelos>
+	</grupo>
+</cena>

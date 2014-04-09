@@ -438,6 +438,7 @@ int main(int argc, char **argv) {
 	glutCreateWindow("Motor 3D@CG");
 
 
+	// carrega o ficheiro xml para a estrutura
 	drawXml(file);
 
 // registo de funções 

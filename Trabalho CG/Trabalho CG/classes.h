@@ -5,7 +5,6 @@
 #include <GL/glut.h>
 
 
-
 using namespace std;
 
 #define TSIZE 3
@@ -119,7 +118,7 @@ public:
 		set_values(px, py, pz, TYPE_ESCALA);
 	}
 	void draw(){
-		glTranslatef(transf::x(), transf::y(), transf::z());
+		glScalef(transf::x(), transf::y(), transf::z());
 	}
 };
 
