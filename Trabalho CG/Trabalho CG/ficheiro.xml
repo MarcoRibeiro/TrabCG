@@ -1,39 +1,105 @@
 <cena>
 	<grupo>
-		<translacao Y=-1 />
+	<escala X=0.5 Y=0.5 Z=0.5 />
+	<!-- arvore -->
+
+	<grupo>
+		<translacao X=1.5/>
+		<escala X=1 Y=2 Z=1 />
 		<grupo>
-			<translacao X=1/>
+			<translacao Y=0.2/>
+			<escala X=0.3 Y=0.7 Z=0.3 />
 			<modelos>
-				<modelo ficheiro=cubo.txt />
+				<modelo ficheiro=nariz.txt />
+			</modelos>
+		</grupo>
+		<grupo>
+			<translacao Y=0.5/>
+			<escala X=1 Y=0.5 Z=1 />
+			<modelos>
+				<modelo ficheiro=coneVerde.txt />
 			</modelos>
 			<grupo>
-				<translacao X=-2 Y=1 />
-				<rotacao angulo=30 eixoX=1 />
+				<translacao Y=1/>
+				<escala X=0.5 Y=0.5 Z=0.5 />
 				<modelos>
-					<modelo ficheiro=cubo.txt />
-					<modelo ficheiro=big_esfera.txt />
+					<modelo ficheiro=coneVerde.txt />
 				</modelos>
+				<grupo>
+					<translacao Y=1/>
+					<escala X=0.5 Y=0.5 Z=0.5 />
+					<modelos>
+						<modelo ficheiro=coneVerde.txt />
+					</modelos>
+				</grupo>
 			</grupo>
+		</grupo>
+	</grupo>
+	<!-- terreno -->
+	<grupo>
+		<translacao Y=-1/>
+		<modelos>
+			<modelo ficheiro=terreno.txt />
+		</modelos>
+	</grupo>
+	<!-- boneco -->
+	<grupo>
+		<translacao X=-1/>
+		<modelos>
+			<modelo ficheiro=bolaBranca.txt />
+		</modelos>
+		<grupo>
+			<translacao Y=1.4/>
+			<escala X=0.6 Y=0.6 Z=0.6 />
+			<modelos>
+				<modelo ficheiro=bolaBranca.txt />
+			</modelos>
 			<grupo>
-				<rotacao angulo=90 eixoZ=1 />
+				<translacao Y=1.4/>
+				<escala X=0.5 Y=0.5 Z=0.5 />
 				<modelos>
-					<modelo ficheiro=cone.txt />
+					<modelo ficheiro=bolaBranca.txt />
 				</modelos>
+				<grupo>
+					<translacao Y=0.3 X=0.5 Z=0.7/>
+					<escala X=0.2 Y=0.2 Z=0.2 />
+					<modelos>
+						<modelo ficheiro=olho.txt />
+					</modelos>
+				</grupo>
+				<grupo>
+					<translacao Y=0.3 X=-0.5 Z=0.7/>
+					<escala X=0.2 Y=0.2 Z=0.2 />
+					<modelos>
+						<modelo ficheiro=olho.txt />
+					</modelos>
+				</grupo>
+				<grupo>
+					
+					<rotacao angulo=90 eixoX=1/>
+					<translacao Y=1.1/>
+					<escala X=0.2 Y=1 Z=0.2 />
+					<modelos>
+						<modelo ficheiro=nariz.txt />
+					</modelos>
+				</grupo>
+				<grupo>
+					<translacao Y=1.6/>
+					<modelos>
+						<modelo ficheiro=nariz.txt />
+					</modelos>
+					<grupo>
+
+						<translacao Y=-1/>
+						<escala X=1.5 Y=0.1 Z=1.5 />
+						<modelos>
+							<modelo ficheiro=bola.txt />
+						</modelos>
+					</grupo>
+				</grupo>
+				
 			</grupo>
 		</grupo>
-		<grupo>
-			<translacao Z=-1 />
-			<rotacao angulo=90 eixoX=1 />
-			<modelos>
-				<modelo ficheiro=plano.txt />
-			</modelos>
-		</grupo>
-		<grupo>
-			<translacao Y=1.5 />
-			<escala X=0.2 Y=0.2 Z=0.2 />
-			<modelos>
-				<modelo ficheiro=telhado.txt />
-			</modelos>
-		</grupo>
+	</grupo>
 	</grupo>
 </cena>

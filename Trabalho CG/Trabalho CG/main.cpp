@@ -15,10 +15,10 @@
 #define MNU_PONTOS 2
 
 
-//variavel que vai conter o ficheiro xml
+//variavel que vai conter o ficheiro xml inicializado a ""
 string file = "";
 
-int linhas = 0;  // default linhas;
+int linhas = 0;  // default linhas (leitura do ficheiro xml);
 
 
 // IMPRESSÃO NO ECRA
@@ -33,9 +33,14 @@ float beta = 0;  // usado para rotação da câmara
 float zoom = 1.0;  // zoom inicial
 float zoomInc = 0.05;  //incremento zoom
 
+float panlr = 0;
+float panud = 0;
+float panbf = 0;
+
 // TAMANHO DA JANELA
-unsigned int wwidth = 1200;
+unsigned int wwidth = 1300;
 unsigned int wheigth = 690;
+
 
 
 // CLASS QUE CONTEM TDAS AS PRIMITIVAS
@@ -134,6 +139,7 @@ void drawScene()
 
 
 //NÃO UTILIZADO
+/*
 void drawPrimitiva(primitive p)
 {
 	vector<triangle> aux = p.getTriangulos();
@@ -148,7 +154,6 @@ void drawPrimitiva(primitive p)
 		glEnd();
 	} 
 }
-
 //NÃO UTILIZADO
 void drawPrimitiva(primitive* p)
 {
@@ -164,9 +169,13 @@ void drawPrimitiva(primitive* p)
 		glEnd();
 	}
 }
+*/
 
+
+
+// PASSAR AS FUNCOES DO XML PARA FICHEIROS SEPARADOS
 //Le de um filho <modelos> e guarda todas as primitivas na classe cena
-void drawModelos(TiXmlElement* modelos) {
+void readModelos(TiXmlElement* modelos) {
 	const char* attr;
 	for (TiXmlElement* elem = modelos->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement()){
 		string elemName = elem->Value();
@@ -179,18 +188,18 @@ void drawModelos(TiXmlElement* modelos) {
 
 }
 
-//Le recursivamente todo um grupo e armazena todas as transformações/primitivas na classe cena 
-//na mesma ordem que vao sendo imprimidas
-void drawGrupo(TiXmlElement* grupo) {
+//Le recursivamente todo um <grupo> e armazena todas as transformações/primitivas na classe cena 
+//na mesma ordem que devem sao lidas	
+void readGrupo(TiXmlElement* grupo) {
 	//glPushMatrix();
 	c.addTransf(new psMatrix());
 	for (TiXmlElement* elem = grupo->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement()) {
 		string elemName = elem->Value();
 		if (elemName == "grupo") {
-			drawGrupo(elem);
+			readGrupo(elem);
 		}
 		else if (elemName == "modelos") {
-			drawModelos(elem);
+			readModelos(elem);
 		}
 		else if (elemName == "translacao") {
 			float x=0, y=0, z=0;
@@ -220,8 +229,8 @@ void drawGrupo(TiXmlElement* grupo) {
 }
 
 
-// Carrega em memoria todos as primitivas e transformações de um ficheiro Xml (usa drawGrupo e DrawModelos)
-void drawXml(string ficheiro) {
+// Carrega em memoria todos as primitivas e transformações de um ficheiro Xml (usa readGrupo e readModelos)
+void readXml(string ficheiro) {
 	TiXmlDocument doc;
 	doc.LoadFile(ficheiro.c_str());
 	TiXmlElement* root = doc.FirstChildElement();
@@ -229,13 +238,15 @@ void drawXml(string ficheiro) {
 		string elemName = elem->Value();
 		if (elemName == "grupo")
 		{
-			drawGrupo(elem);
+			readGrupo(elem);
 		}
 	}
 }
+////////////////////////////////////
 
 
-//Desenha uma cena no ecra por ordem que armazenamento
+
+//Desenha uma cena no ecra por ordem que armazenamento //  OBSOLETO APOS VBO
 void drawCena(cena c)
 {
 	vector<drawable*> aux = c.getItens();
@@ -243,6 +254,17 @@ void drawCena(cena c)
 	{
 		drawable* d = *it._Ptr;
 		d->draw();
+	}
+}
+
+void drawCenaVBO(cena c)
+{
+	vector<drawable*> aux = c.getItens();
+	for (vector<drawable*>::iterator it = aux.begin(); it != aux.end(); ++it)
+	{
+		//drawable* d = *it._Ptr;
+		//d->draw();
+
 	}
 }
 
@@ -281,8 +303,8 @@ void renderScene(void) {
 
 	// set the camera
 	glLoadIdentity();
-	gluLookAt(raiocamara*cos(beta)*sin(alfa), raiocamara*sin(beta), raiocamara*cos(beta)*cos(alfa),
-		0.0, 0.0, 0.0,
+	gluLookAt(raiocamara*cos(beta)*sin(alfa)+panlr, raiocamara*sin(beta)+panud, raiocamara*cos(beta)*cos(alfa)+panbf,
+		0.0+panlr, 0.0+panud, 0.0+panbf,
 		0.0f, 1.0f, 0.0f);
 
 
@@ -346,6 +368,24 @@ void kP(unsigned char codigo, int x, int y)
 			break;
 		case 'z':
 			zoom -= zoomInc;
+			break;
+		case 'r':
+			panbf += 0.3;
+			break;
+		case 'f':
+			panbf -= 0.3;
+			break;
+		case 'q':
+			panlr -= 0.3;
+			break;
+		case 'e':
+			panlr += 0.3;
+			break;
+		case 'w':
+			panud += 0.3;
+			break;
+		case 's':
+			panud -= 0.3;
 			break;
 		}
 		glutPostRedisplay();
@@ -439,7 +479,7 @@ int main(int argc, char **argv) {
 
 
 	// carrega o ficheiro xml para a estrutura
-	drawXml(file);
+	readXml(file);
 
 // registo de funções 
 	glutDisplayFunc(renderScene);

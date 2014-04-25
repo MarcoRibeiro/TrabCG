@@ -1,7 +1,88 @@
 <cena>
-<modelo ficheiro=esfera.txt />
-<modelo ficheiro=cone.txt />
-<modelo ficheiro=cilindro.txt />
-<modelo ficheiro=plano.3d />
-<modelo ficheiro=cubo.txt />
+	<grupo>
+		<modelos>
+			<modelo ficheiro=sol.txt />
+		</modelos>
+		<!-- Mercurio -->
+		<grupo>
+			
+			<translacao X=1.67/>
+			<escala X=0.04 Y=0.04 Z=0.04 />
+			<modelos>
+				<modelo ficheiro=sol.txt />
+			</modelos>
+		</grupo>
+		<!-- Venus -->
+		<grupo>
+			
+			<translacao X=2.17/>
+			<escala X=0.09 Y=0.09 Z=0.09 />
+			<modelos>
+				<modelo ficheiro=sol.txt />
+			</modelos>
+		</grupo>
+		<!-- Terra -->
+		<grupo>
+			
+			<translacao X=2.47/>
+			<escala X=0.094 Y=0.094 Z=0.094 />
+			<modelos>
+				<modelo ficheiro=sol.txt />
+			</modelos>
+			<!-- Lua -->
+			<grupo>
+				<translacao Y=1.17 X=1.17/>
+				<escala X=0.2 Y=0.2 Z=0.2 />
+				<modelos>
+					<modelo ficheiro=sol.txt />
+				</modelos>
+			</grupo>
+		</grupo>
+		<!-- Marte -->
+		<grupo>
+			
+			<translacao X=3.28/>
+			<escala X=0.048 Y=0.048 Z=0.048 />
+			<modelos>
+				<modelo ficheiro=sol.txt />
+			</modelos>
+		</grupo>
+		<!-- Jupiter -->
+		<grupo>
+			
+			<translacao X=8.78/>
+			<escala X=0.5 Y=0.5 Z=0.5 />
+			<modelos>
+				<modelo ficheiro=sol.txt />
+			</modelos>
+		</grupo>
+		<!-- saturno -->
+		<grupo>
+			
+			<translacao X=15.27/>
+			<escala X=0.4 Y=0.4 Z=0.4 />
+			<modelos>
+				<modelo ficheiro=sol.txt />
+			</modelos>
+		</grupo>
+		<!-- Urano -->
+		<grupo>
+			
+			<translacao X=29.7/>
+			<escala X=0.15 Y=0.15 Z=0.15 />
+			<modelos>
+				<modelo ficheiro=sol.txt />
+			</modelos>
+		</grupo>
+		<!-- Neptuno -->
+		<grupo>
+			
+			<translacao X=45.97/>
+			<escala X=0.15 Y=0.15 Z=0.15 />
+			<modelos>
+				<modelo ficheiro=sol.txt />
+			</modelos>
+		</grupo>
+	</grupo>
+
 </cena>

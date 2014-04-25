@@ -44,5 +44,8 @@
     <ClInclude Include="classes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="transf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
