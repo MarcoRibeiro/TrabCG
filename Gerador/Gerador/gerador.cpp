@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include "classes.h"
+#include "patchBezier.h"
 
 #define PI 3.14159265358979323846
 
@@ -152,6 +153,28 @@ primitive drawSphere(float raio, int fatias, int camadas)
 	return p;
 }
 
+primitive drawBezierSurface(string file, int tesselacao) {
+	primitive pri;
+	patchFile p = (file);
+
+	int** patches = p.getPatches();
+	float** vertices = p.getVertices();
+
+	int nj = p.get_NPatches();
+	int nv = p.get_NVertices();
+
+	vector<float> pontos = p.getpontosVBO(tesselacao);
+
+	for (int i = 0; i < pontos.size(); i=i+9)
+	{
+		int j = 0;
+		vertex v1 (pontos[i+(j++)],pontos[i+(j++)],pontos[i+(j++)]);
+		vertex v2 (pontos[i+(j++)], pontos[i+(j++)], pontos[i+(j++)]);
+		vertex v3 (pontos[i+(j++)], pontos[i+(j++)], pontos[i+(j++)]);
+		pri.addTriangle(triangle(v1, v2, v3));
+	}
+	return pri;
+}
 
 
 
@@ -160,8 +183,9 @@ static void show_usage()
 {
 	std::cerr << endl << "\nUsage: primitiva <options> <filename.txt>\n" << endl << "cilindro <lados altura raio>" << endl <<
 		"cone <lados altura raio>" << endl << "cubo <aresta>" << endl << "paralelipipedo <comprimento largura altura>" << endl <<
-		"plano <comprimento largura>" << endl << "esfera <raio fatias camadas>" << endl;  
+		"plano <comprimento largura>" << endl << "esfera <raio fatias camadas>\n" << "supBezier <ficheiro .patch tesselacao>" << endl;  
 }
+
 
 int main(int argc, char **argv) {
 	primitive p;
@@ -281,6 +305,25 @@ int main(int argc, char **argv) {
 						p = drawSphere(raio, camadas, fatias);
 						p.saveFile(file);
 
+					}
+					catch (invalid_argument)
+					{
+						std::cerr << err;
+					}
+				}
+			}
+			else if (arg == "supBezier") {
+				string err = "\n-- Erro -- Argumentos invalidos\nUsage: supBezier <ficheiro.patch tesselacao>\n";
+				if (argc != 5){
+					std::cerr << err;
+				}
+				else{
+					try{
+						string file = argv[i + 1];
+						int tesselacao = stoi(argv[i + 2]);
+						string savefile = argv[i + 3];
+						p = drawBezierSurface(file, tesselacao);
+						p.saveFile(savefile);
 					}
 					catch (invalid_argument)
 					{

@@ -1,11 +1,15 @@
+#include "transf.h"
 #include <array>
 #include <vector>
 #include <sstream>
 #include <fstream>
+#include <GL/glut.h>
+
 
 using namespace std;
 
-#define TSIZE 3
+//#define TSIZE 3
+
 
 class color {
 	float cr;
@@ -28,7 +32,6 @@ public:
 		return ss.str();
 	}
 };
-
 class vertex {
 	float px;
 	float py;
@@ -58,10 +61,7 @@ public:
 		vertex temp(x, y, z);
 		return temp;
 	}
-
-
 };
-
 class triangle {
 	vertex p1, p2, p3;
 	color cor;
@@ -101,46 +101,69 @@ public:
 	}
 };
 
-class primitive
+
+class primitive : public drawable
 {
 	vector<triangle> triangulos;
 
 	public:
 
-		primitive() {
+		primitive() { setType(TYPE_PRIMITIVE); }
+		primitive(string file) {
+			loadFile(file);
+			setType(TYPE_PRIMITIVE);
 		}
 
 		void addTriangle(triangle t) {
 			triangulos.push_back(t);
 		}	
 
-
-		triangle getTriangle(int posicao)
+		// Passa copia de todos os triangulos  // PASSAR POR REFERENCIA ????
+		vector<float> getPontos()
 		{
-			return triangulos[posicao];
-		}
-
-		vector<triangle> getTriangulos()
-		{
-			vector<triangle> aux;
+			vector<float> vertices;
 			for (vector<triangle>::iterator it = triangulos.begin(); it != triangulos.end(); ++it)
 			{
-				aux.push_back(*it);
+				vertices.push_back(it._Ptr->getP1().getX());
+				vertices.push_back(it._Ptr->getP1().getY());
+				vertices.push_back(it._Ptr->getP1().getZ());
+
+				vertices.push_back(it._Ptr->getP2().getX());
+				vertices.push_back(it._Ptr->getP2().getY());
+				vertices.push_back(it._Ptr->getP2().getZ());
+
+				vertices.push_back(it._Ptr->getP3().getX());
+				vertices.push_back(it._Ptr->getP3().getY());
+				vertices.push_back(it._Ptr->getP3().getZ());
 			}
-			return aux;
+			return vertices;
 		}
 
+
+		//Usado para guardar primitivas
 		string toString()
 		{
 			stringstream ss(stringstream::in | stringstream::out);
-			//ss << triangulos.size() << endl;
 			for (vector<triangle>::iterator it = triangulos.begin(); it != triangulos.end(); ++it)
 			{
-			ss	<< it._Ptr->toString() << endl;
+				ss	<< it._Ptr->toString() << endl;
 			}
 			return ss.str();
 		}
+		int saveFile(string file)
+		{
+			ofstream f(file);
+			if (f.is_open())
+			{
+				f << toString();
+				f.close();
+			}
+			else return 0;
 
+			return 1;
+		}
+
+		// Leitura de ficheiros com primitivas
 		void addTriangle(string str)
 		{
 			stringstream ss(stringstream::in | stringstream::out);
@@ -197,10 +220,9 @@ class primitive
 			addTriangle(t);
 
 		}
-
 		void addTriangulos(string str)
 		{
-			string parsed;// , input = "text to be parsed";
+			string parsed;
 			stringstream input_stringstream(str);
 			stringstream ss(stringstream::in | stringstream::out);
 
@@ -212,7 +234,6 @@ class primitive
 			}
 			int f = 0;
 		}
-
 		int loadFile(string file)  // retorna 1 caso leitura com sucesso 0 se falha
 		{
 			stringstream content(stringstream::in | stringstream::out);
@@ -230,26 +251,65 @@ class primitive
 			addTriangulos(content.str());
 
 			return 1;
-		}
-		
-		int saveFile(string file)
-		{
-			ofstream f(file);
-			if (f.is_open())
-			{
-				f << toString();
-				f.close();
-			}
-			else return 0;
+		}	
 
-			return 1;
+		//Imprime em OpenGL
+		void draw(){
+			for (vector<triangle>::iterator it = triangulos.begin(); it != triangulos.end(); ++it)
+			{
+				triangle* a = it._Ptr;
+				glBegin(GL_TRIANGLES);
+				glColor3f(a->getColorR(), a->getColorG(), a->getColorB());
+				glVertex3f(a->getP1().getX(), a->getP1().getY(), a->getP1().getZ());
+				glVertex3f(a->getP2().getX(), a->getP2().getY(), a->getP2().getZ());
+				glVertex3f(a->getP3().getX(), a->getP3().getY(), a->getP3().getZ());
+				glEnd();
+			}
 		}
+
 };
 
+
+
+class cena {
+	vector<drawable*> itens;
+	vector<primitive*> primitivas;
+	int n_primitivas = 0;
+
+public:
+	cena() {};
+
+	void addPrimitiva(primitive* p) {
+		itens.push_back(p);
+		primitivas.push_back(p);
+		n_primitivas++;
+	}
+
+	void addTransf(transf* t) {
+		itens.push_back(t);
+	}
+
+	int getN_primitivas() { return n_primitivas;  }
+
+	vector<drawable*> getItens() {
+		return itens;
+	}
+
+	vector<primitive*> getPrimitivas()
+	{
+		return primitivas;
+	}
+
+
+	
+};
+
+
+
+//OBSOLETO
 class scene {
 	vector<primitive> primitivas;
 public:
-
 
 	void addprimitiva(primitive p)
 	{
@@ -263,11 +323,13 @@ public:
 	}
 	vector<primitive> getPrimitivas()
 	{
+		/*
 		vector<primitive> aux;
 		for (vector<primitive>::iterator it = primitivas.begin(); it != primitivas.end(); ++it)
 		{
 			aux.push_back(*it);
 		}
-		return aux;
+		return aux;*/
+		return primitivas;
 	}
 };

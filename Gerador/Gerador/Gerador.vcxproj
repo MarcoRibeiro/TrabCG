@@ -80,6 +80,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Trabalho CG\Trabalho CG\classes.h" />
+    <ClInclude Include="patchBezier.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gerador.cpp" />

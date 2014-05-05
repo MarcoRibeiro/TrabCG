@@ -107,25 +107,37 @@ class primitive : public drawable
 
 	public:
 
-		primitive() {
-		}
+		primitive() { setType(TYPE_PRIMITIVE); }
 		primitive(string file) {
 			loadFile(file);
+			setType(TYPE_PRIMITIVE);
 		}
 
 		void addTriangle(triangle t) {
 			triangulos.push_back(t);
 		}	
 
-		vector<triangle> getTriangulos()
+
+		vector<float> getPontos()
 		{
-			vector<triangle> aux;
+			vector<float> vertices;
 			for (vector<triangle>::iterator it = triangulos.begin(); it != triangulos.end(); ++it)
 			{
-				aux.push_back(*it);
+				vertices.push_back(it._Ptr->getP1().getX());
+				vertices.push_back(it._Ptr->getP1().getY());
+				vertices.push_back(it._Ptr->getP1().getZ());
+
+				vertices.push_back(it._Ptr->getP2().getX());
+				vertices.push_back(it._Ptr->getP2().getY());
+				vertices.push_back(it._Ptr->getP2().getZ());
+
+				vertices.push_back(it._Ptr->getP3().getX());
+				vertices.push_back(it._Ptr->getP3().getY());
+				vertices.push_back(it._Ptr->getP3().getZ());
 			}
-			return aux;
+			return vertices;
 		}
+
 
 		//Usado para guardar primitivas
 		string toString()
@@ -240,10 +252,10 @@ class primitive : public drawable
 			return 1;
 		}	
 
-		
-
-		//Imprime em OpenGL
+		//Imprime em OpenGL modo imediato
 		void draw(){
+
+
 			for (vector<triangle>::iterator it = triangulos.begin(); it != triangulos.end(); ++it)
 			{
 				triangle* a = it._Ptr;
@@ -256,55 +268,40 @@ class primitive : public drawable
 			}
 		}
 
-		void drawVBO(){
-
-		}
 };
 
 
 
 class cena {
 	vector<drawable*> itens;
+	vector<primitive*> primitivas;
+	int n_primitivas = 0;
 
 public:
 	cena() {};
+
 	void addPrimitiva(primitive* p) {
 		itens.push_back(p);
+		primitivas.push_back(p);
+		n_primitivas++;
 	}
+
 	void addTransf(transf* t) {
 		itens.push_back(t);
 	}
+
+	int getN_primitivas() { return n_primitivas;  }
+
 	vector<drawable*> getItens() {
 		return itens;
 	}
-};
 
-
-
-//OBSOLETO
-class scene {
-	vector<primitive> primitivas;
-public:
-
-	void addprimitiva(primitive p)
+	vector<primitive*> getPrimitivas()
 	{
-		primitivas.push_back(p);
-	}
-	void addprimitiva(string file)
-	{
-		primitive p;
-		p.loadFile(file);
-		primitivas.push_back(p);
-	}
-	vector<primitive> getPrimitivas()
-	{
-		/*
-		vector<primitive> aux;
-		for (vector<primitive>::iterator it = primitivas.begin(); it != primitivas.end(); ++it)
-		{
-			aux.push_back(*it);
-		}
-		return aux;*/
 		return primitivas;
 	}
+
+
+	
 };
+

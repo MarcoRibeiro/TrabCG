@@ -1,0 +1,38 @@
+<cena>
+<grupo>
+	<translacao X=-2 />
+	<escala X=0.3 Y=0.3 Z=0.3 />
+	<rotacao angulo=90 eixoX=0 eixoY=0 eixoZ=1 />
+	
+	<modelos>
+		<modelo ficheiro=nariz.txt />
+	</modelos>
+	<grupo>
+		<rotacao angulo=90 eixoX=0 eixoY=0 eixoZ=-1 />
+		<escala X=0.3 Y=0.3 Z=0.3 />
+		<modelos>
+			<modelo ficheiro=esfera.txt />
+		</modelos>
+	</grupo>
+	
+</grupo>
+<grupo>
+	<translacao X=2 />
+	<escala X=0.3 Y=0.3 Z=0.3 />
+	<modelos>
+		<modelo ficheiro=esfera.txt />
+	</modelos>
+</grupo>
+<grupo>
+	<escala X=0.3 Y=0.3 Z=0.3 />
+	<modelos>
+		<modelo ficheiro=esfera.txt />
+	</modelos>
+	<grupo>
+	<escala X=0.1 Y=0.1 Z=0.1 />
+	<modelos>
+		<modelo ficheiro=esfera.txt />
+	</modelos>
+	</grupo>
+</grupo>
+</cena>

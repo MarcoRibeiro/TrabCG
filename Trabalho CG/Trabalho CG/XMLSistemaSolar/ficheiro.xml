@@ -25,9 +25,20 @@
 		</modelos>
 	</grupo>
 	<grupo>
+	
 		<rotacao angulo=100 eixoX=0 eixoY=1 eixoZ=0 />
 		<translacao X=0.9/>
 		<escala X=0.065 Y=0.065 Z=0.065 />
+		<translacaoT tempo=10>
+			<ponto X=1 Y=0 Z=0 />
+			<ponto X=0.707 Y=0.707 Z=0 />
+			<ponto X=-1 Y=1 Z=0 />
+			<ponto X=-0.707 Y=0.707 Z=0 />
+			<ponto X=-1 Y=0 Z=1 />
+			<ponto X=-0.707 Y=-0.707 Z=0 />
+			<ponto X=0 Y=-1 Z=0 />
+			<ponto X=0.707 Y=-0.707 Z=0 />
+		</translacaoT>
 		<modelos>
 			<modelo ficheiro=esfera.txt nome=terra/>
 		</modelos>

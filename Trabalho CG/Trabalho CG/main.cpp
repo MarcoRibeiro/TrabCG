@@ -3,6 +3,7 @@
 #include <math.h>
 #include <fstream>
 #include <iostream>
+#include <glew.h>
 #include "TinyXml\tinystr.h"
 #include "TinyXml\tinyxml.h"
 #include "classes.h"
@@ -14,12 +15,15 @@
 #define MNU_OPACO 1
 #define MNU_PONTOS 2
 
+GLuint* buffers;
+int* npontos;  //usado para armazenar em paralelo a quantidade de pontos de cada primitiva
+
 
 //variavel que vai conter o ficheiro xml inicializado a ""
 string file = "";
 
-int linhas = 0;  // default linhas (leitura do ficheiro xml);
-
+int linhas = 0;  // Usado para selecionar visualização por linhas opaco ou pontos
+extern bool tanslationLines = true;
 
 // IMPRESSÃO NO ECRA
 int font1 = (int)GLUT_BITMAP_HELVETICA_12;
@@ -27,9 +31,11 @@ int w = 70, h = 70; // usado para setOrthographicProjection
 
 
 //MOVIMENTO DA CAMARA
-float raiocamara = 5;  // raio rotação
-float alfa = 0;  // usado para rotação da câmara
-float beta = 0;  // usado para rotação da câmara
+//float raiocamara = 5;  // raio rotação
+float alfa = 0;  // usado para rotação da câmara	DESACTIVADOS PARA UTILIZACAO DO RATO
+//float beta = 0;  // usado para rotação da câmara
+
+
 float zoom = 1.0;  // zoom inicial
 float zoomInc = 0.05;  //incremento zoom
 
@@ -37,9 +43,18 @@ float panlr = 0;
 float panud = 0;
 float panbf = 0;
 
+//MOVIMENTO DO RATO
+float camX = 0, camY, camZ = 5;
+int startX, startY, tracking = 0;
+int alpha = 0, beta = 0, r = 5;
+
+
 // TAMANHO DA JANELA
 unsigned int wwidth = 1300;
 unsigned int wheigth = 690;
+
+// Contador de frames
+int timebase = 0, frame = 0;
 
 
 
@@ -93,83 +108,6 @@ void renderSpacedBitmapString(float x, float y, int spacing, void *font, char *s
 }
 
 
-/*
-// CLASS QUE DESENHA NO ECRA
-void drawScene()
-{
-	vector<primitive> c = cena.getPrimitivas();
-
-	for (vector<primitive>::iterator iterator = c.begin(); iterator != c.end(); ++iterator)  // percorrre todas as primitivas
-	{
-		primitive* paux = iterator._Ptr;
-
-
-
-		//Define transformações // melhor invocando outra funcao
-		vector<transf*> transformacoes = paux->getTransformacoes();  // carrega todas as transformações que existirem
-		if (transformacoes.size() != 0)
-		for (vector<transf*>::iterator it2 = transformacoes.begin(); it2 != transformacoes.end(); ++it2)
-		{
-			transf*  t = *it2._Ptr;
-			switch (t->type())
-			{
-			case TYPE_TRANSLACAO:	glTranslatef(t->x(), t->y(), t->z());	break;
-			case TYPE_ROTACAO:  glRotatef(t->angulo(), t->x(), t->y(), t->z()); break;
-			case TYPE_ESCALA:  glScalef(t->x(), t->y(), t->z()); break;
-			}
-
-		}
-
-
-		//Desenha primitiva
-		vector<triangle> aux = paux->getTriangulos();
-		for (vector<triangle>::iterator it = aux.begin(); it != aux.end(); ++it)
-		{
-			triangle* a = it._Ptr;
-			glBegin(GL_TRIANGLES);
-			glColor3f(a->getColorR(), a->getColorG(), a->getColorB());
-			glVertex3f(a->getP1().getX(), a->getP1().getY(), a->getP1().getZ());
-			glVertex3f(a->getP2().getX(), a->getP2().getY(), a->getP2().getZ());
-			glVertex3f(a->getP3().getX(), a->getP3().getY(), a->getP3().getZ());
-			glEnd();
-		}
-	}
-}
-*/
-
-
-//NÃO UTILIZADO
-/*
-void drawPrimitiva(primitive p)
-{
-	vector<triangle> aux = p.getTriangulos();
-	for (vector<triangle>::iterator it = aux.begin(); it != aux.end(); ++it)
-	{
-		triangle* a = it._Ptr;
-		glBegin(GL_TRIANGLES);
-		glColor3f(a->getColorR(), a->getColorG(), a->getColorB());
-		glVertex3f(a->getP1().getX(), a->getP1().getY(), a->getP1().getZ());
-		glVertex3f(a->getP2().getX(), a->getP2().getY(), a->getP2().getZ());
-		glVertex3f(a->getP3().getX(), a->getP3().getY(), a->getP3().getZ());
-		glEnd();
-	} 
-}
-//NÃO UTILIZADO
-void drawPrimitiva(primitive* p)
-{
-	vector<triangle> aux = p->getTriangulos();
-	for (vector<triangle>::iterator it = aux.begin(); it != aux.end(); ++it)
-	{
-		triangle* a = it._Ptr;
-		glBegin(GL_TRIANGLES);
-		glColor3f(a->getColorR(), a->getColorG(), a->getColorB());
-		glVertex3f(a->getP1().getX(), a->getP1().getY(), a->getP1().getZ());
-		glVertex3f(a->getP2().getX(), a->getP2().getY(), a->getP2().getZ());
-		glVertex3f(a->getP3().getX(), a->getP3().getY(), a->getP3().getZ());
-		glEnd();
-	}
-}
-*/
 
 
 
@@ -188,6 +126,23 @@ void readModelos(TiXmlElement* modelos) {
 
 }
 
+void readTranslacaoT(TiXmlElement* modelos, float tempo) {
+	vector<float> curva;
+
+	for (TiXmlElement* elem = modelos->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement()){
+		string elemName = elem->Value();
+		if (elemName == "ponto")
+		{
+			float x = 0, y = 0, z = 0;
+			if (elem->QueryFloatAttribute("X", &x) == TIXML_SUCCESS) {}
+			if (elem->QueryFloatAttribute("Y", &y) == TIXML_SUCCESS) {}
+			if (elem->QueryFloatAttribute("Z", &z) == TIXML_SUCCESS) {}
+			curva.push_back(x); curva.push_back(y);	curva.push_back(z);
+		}
+	}
+	c.addTransf(new translacaoT(curva,tempo));
+}
+
 //Le recursivamente todo um <grupo> e armazena todas as transformações/primitivas na classe cena 
 //na mesma ordem que devem sao lidas	
 void readGrupo(TiXmlElement* grupo) {
@@ -201,6 +156,11 @@ void readGrupo(TiXmlElement* grupo) {
 		else if (elemName == "modelos") {
 			readModelos(elem);
 		}
+		else if (elemName == "translacaoT") {
+			float t;
+			if (elem->QueryFloatAttribute("tempo", &t) == TIXML_SUCCESS) {}
+			readTranslacaoT(elem,t);
+		}
 		else if (elemName == "translacao") {
 			float x=0, y=0, z=0;
 			if (elem->QueryFloatAttribute("X", &x) == TIXML_SUCCESS) {}
@@ -209,12 +169,20 @@ void readGrupo(TiXmlElement* grupo) {
 			c.addTransf(new translacao(x, y, z));
 		}
 		else if (elemName == "rotacao") {
-			float a=0, x = 0, y = 0, z = 0;
+			float a = 0, x = 0, y = 0, z = 0;
 			if (elem->QueryFloatAttribute("angulo", &a) == TIXML_SUCCESS) {}
 			if (elem->QueryFloatAttribute("eixoX", &x) == TIXML_SUCCESS) {}
 			if (elem->QueryFloatAttribute("eixoY", &y) == TIXML_SUCCESS) {}
 			if (elem->QueryFloatAttribute("eixoZ", &z) == TIXML_SUCCESS) {}
 			c.addTransf(new rotacao(a, x, y, z));
+		}
+		else if (elemName == "rotacaoT") {
+				float t = 0, x = 0, y = 0, z = 0;
+				if (elem->QueryFloatAttribute("tempo", &t) == TIXML_SUCCESS) {}
+				if (elem->QueryFloatAttribute("eixoX", &x) == TIXML_SUCCESS) {}
+				if (elem->QueryFloatAttribute("eixoY", &y) == TIXML_SUCCESS) {}
+				if (elem->QueryFloatAttribute("eixoZ", &z) == TIXML_SUCCESS) {}
+				c.addTransf(new rotacaoT(t, x, y, z));
 		}
 		else if (elemName == "escala") {
 			float x = 0, y = 0, z = 0;
@@ -227,7 +195,6 @@ void readGrupo(TiXmlElement* grupo) {
 	}
 	c.addTransf(new ppMatrix());
 }
-
 
 // Carrega em memoria todos as primitivas e transformações de um ficheiro Xml (usa readGrupo e readModelos)
 void readXml(string ficheiro) {
@@ -257,14 +224,56 @@ void drawCena(cena c)
 	}
 }
 
+
+// aloca dinamicamente variaveis buffers e npontos
+void iniciaVBO() {
+
+	vector<primitive*> primitivas = c.getPrimitivas();
+	int n_primitivas = c.getN_primitivas();  //numero de objectos
+
+
+	buffers = (GLuint*)malloc(sizeof(GLuint)*n_primitivas);
+	npontos = (int*)malloc(sizeof(int)*n_primitivas);
+	if ((buffers == NULL) || (npontos == NULL)) exit(1);
+
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glGenBuffers(n_primitivas, buffers);
+
+	// carrega todos os bufers para a placa gráfica
+	int i = 0;
+	for (vector<primitive*>::iterator it = primitivas.begin(); it != primitivas.end(); it++) {
+
+		vector<float> pontos = (*it._Ptr)->getPontos();
+		npontos[i] = pontos.size(); // guarda o numero de pontos da primitiva
+
+		glBindBuffer(GL_ARRAY_BUFFER, buffers[i]);
+		glBufferData(GL_ARRAY_BUFFER, pontos.size()*sizeof(float), &pontos[0], GL_STATIC_DRAW);
+		
+		i++;
+	}
+}
+
+//Percorre todos os itens desenhaveis, desenha transformações na classe cena
+//e objectos carregados para a placa grafica.. Assume 
+
 void drawCenaVBO(cena c)
 {
+	int i = 0;
 	vector<drawable*> aux = c.getItens();
 	for (vector<drawable*>::iterator it = aux.begin(); it != aux.end(); ++it)
 	{
-		//drawable* d = *it._Ptr;
-		//d->draw();
-
+		drawable* d = *it._Ptr;
+		if (d->type() == TYPE_PRIMITIVE) {
+			//	primitive* p = (primitive*) d;
+			glBindBuffer(GL_ARRAY_BUFFER, buffers[i]);
+			glVertexPointer(3, GL_FLOAT, 0, 0);
+			glDrawArrays(GL_TRIANGLES, 0, npontos[i]);
+			i++;
+		}
+		else {
+			d->draw(); // imprime transformações
+		}
 	}
 }
 
@@ -297,15 +306,22 @@ void changeSize(int w, int h) {
 
 
 void renderScene(void) {
+	float fps;
+	int time;
 
 	// clear buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// set the camera
 	glLoadIdentity();
+	gluLookAt(camX, camY, camZ,
+		0.0, 0.0, 0.0,
+		0.0f, 1.0f, 0.0f);
+
+	/* DESACTIVADO PARA ACTIVAR MOVIMENTO COM O RATO
 	gluLookAt(raiocamara*cos(beta)*sin(alfa)+panlr, raiocamara*sin(beta)+panud, raiocamara*cos(beta)*cos(alfa)+panbf,
 		0.0+panlr, 0.0+panud, 0.0+panbf,
-		0.0f, 1.0f, 0.0f);
+		0.0f, 1.0f, 0.0f);*/
 
 
 
@@ -319,8 +335,10 @@ void renderScene(void) {
 	}
 
 
-	drawCena(c);
+	drawCenaVBO(c);
 
+
+	///////////IMPRESSAO AJUDA/////////////////
 	setOrthographicProjection();
 	glPushMatrix();
 	glLoadIdentity();
@@ -331,6 +349,18 @@ void renderScene(void) {
 	glPopMatrix();
 	resetPerspectiveProjection();
 	
+
+	//////////////// FPS ///////////////////////
+	frame++;
+	time = glutGet(GLUT_ELAPSED_TIME);
+	if (time - timebase > 1000) {
+		fps = frame*1000.0 / (time - timebase);
+		timebase = time;
+		frame = 0;
+		std::string buff = std::to_string(fps);
+		glutSetWindowTitle(buff.c_str());
+	}
+
 	// End of frame
 	glutSwapBuffers();
 }
@@ -391,6 +421,70 @@ void kP(unsigned char codigo, int x, int y)
 		glutPostRedisplay();
 	}
 
+void processMouseButtons(int button, int state, int xx, int yy)
+{
+	if (state == GLUT_DOWN)  {
+		startX = xx;
+		startY = yy;
+		if (button == GLUT_LEFT_BUTTON)
+			tracking = 1;
+		else if (button == GLUT_RIGHT_BUTTON)
+			tracking = 2;
+		else
+			tracking = 0;
+	}
+	else if (state == GLUT_UP) {
+		if (tracking == 1) {
+			alpha += (xx - startX);
+			beta += (yy - startY);
+		}
+		else if (tracking == 2) {
+
+			r -= yy - startY;
+			if (r < 3)
+				r = 3.0;
+		}
+		tracking = 0;
+	}
+}
+
+void processMouseMotion(int xx, int yy)
+{
+	int deltaX, deltaY;
+	int alphaAux, betaAux;
+	int rAux;
+
+	if (!tracking)
+		return;
+
+	deltaX = xx - startX;
+	deltaY = yy - startY;
+
+	if (tracking == 1) {
+
+		alphaAux = alpha + deltaX;
+		betaAux = beta + deltaY;
+
+		if (betaAux > 85.0)
+			betaAux = 85.0;
+		else if (betaAux < -85.0)
+			betaAux = -85.0;
+
+		rAux = r;
+	}
+	else if (tracking == 2) {
+
+		alphaAux = alpha;
+		betaAux = beta;
+		rAux = r - deltaY;
+		if (rAux < 3)
+			rAux = 3;
+	}
+	camX = rAux * sin(alphaAux * 3.14 / 180.0) * cos(betaAux * 3.14 / 180.0);
+	camZ = rAux * cos(alphaAux * 3.14 / 180.0) * cos(betaAux * 3.14 / 180.0);
+	camY = rAux *							     sin(betaAux * 3.14 / 180.0);
+}
+
 
 // escrever função de processamento do menu
 void menu(int opcao) {
@@ -404,55 +498,15 @@ void menu(int opcao) {
 			break;
 		case 3:
 			linhas = MNU_PONTOS;
+		case 4:
+			 
+			if (tanslationLines) tanslationLines = false;
+			else tanslationLines = true;
+			break;
 		}
 		glutPostRedisplay();
 	}
 
-
-/*
-vector<string> desenha_cena(TiXmlDocument elem)
-{
-	vector<string> modelos;
-
-	TiXmlDocument doc;
-	doc.LoadFile(file.c_str());
-	TiXmlElement* root = doc.FirstChildElement();
-	const char* attr;
-
-	const char* x;
-	const char* y;
-	const char* z;
-
-	string value;
-	for (TiXmlElement* elem = root->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement()){
-		string elemName = elem->Value();
-		if (elemName == "translacao")
-		{
-			x = elem->Attribute("X");
-			y = elem->Attribute("Y");
-			z = elem->Attribute("Z");
-		}
-
-		if (elemName == "modelo")
-		{
-			attr = elem->Attribute("ficheiro");
-			modelos.push_back(attr);
-		}
-	}
-	return modelos;
-}*/
-
-
-/*
-//	Dado um ficheiro xml carrega todos as primitivas para a cena
-void carregaModelos(string file) {
-		vector<string> modelos = xmlParse(file);
-
-		for (vector<string>::iterator it = modelos.begin(); it != modelos.end(); ++it)
-		{
-			cena.addprimitiva(*it);
-		}
-}*/
 
 
 
@@ -465,8 +519,6 @@ int main(int argc, char **argv) {
 	else
 		file = "ficheiro.xml";
 
-// Carrega dados para a class cena
-//	carregaModelos(file);
 
 // inicialização
 	glutInit(&argc, argv);
@@ -476,26 +528,33 @@ int main(int argc, char **argv) {
 	glutInitWindowPosition(ww, 0);
 	glutInitWindowSize(wwidth,wheigth);
 	glutCreateWindow("Motor 3D@CG");
+	glewInit();
 
-
-	// carrega o ficheiro xml para a estrutura
+// carrega o ficheiro xml para a estrutura
 	readXml(file);
+
+//  converte cena em vbo e carrega para a placa gráfica
+	iniciaVBO();
 
 // registo de funções 
 	glutDisplayFunc(renderScene);
-//	glutIdleFunc(renderScene);
+	glutIdleFunc(renderScene);
 	glutReshapeFunc(changeSize);
 
 // pôr aqui registo da funções do teclado e rato
 	glutSpecialFunc(sK);
 	glutKeyboardFunc(kP);
 
+	// pôr aqui registo da funções do rato
+	glutMouseFunc(processMouseButtons);
+	glutMotionFunc(processMouseMotion);
 
 // pôr aqui a criação do menu
 	int i = glutCreateMenu(menu);
-	glutAddMenuEntry("Linhas",1);
-	glutAddMenuEntry("Opaco",2);
-	glutAddMenuEntry("Pontos",3);
+	glutAddMenuEntry("Exibir Linhas",1);
+	glutAddMenuEntry("Exibir Opaco",2);
+	glutAddMenuEntry("Exibir Pontos",3);
+	glutAddMenuEntry("Exibir Linhas de Tanslação", 4);
 
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
@@ -507,6 +566,6 @@ int main(int argc, char **argv) {
 	glutMainLoop();
 	
 
-	return 0;
+	//return 0;
 }
 
