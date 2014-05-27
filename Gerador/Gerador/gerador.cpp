@@ -1,32 +1,33 @@
 #include <math.h>
 #include <fstream>
 #include <iostream>
-#include "classes.h"
+#include "C:\Users\Nelson\Documents\GitHub\TrabCG\Trabalho CG\Trabalho CG\classes.h"
 #include "patchBezier.h"
 
-#define PI 3.14159265358979323846
+#define PI 3.14159
 
-primitive drawPlane(float largura, float comprimento)
+
+primitiveVBO drawPlane(float largura, float comprimento)
 {
-	primitive p;
+	primitiveVBO p;
 	float l = largura / 2;
 	float c = comprimento / 2;
 
-	vertex p1(-c, 0, l);
-	vertex p2(c, 0, l);
-	vertex p3(c, 0, -l);
-	vertex p4(-c, 0, -l);
-	triangle t1(p1, p2, p3);	t1.setColor(1, 1, 0);
-	triangle t2(p3, p4, p1);	t2.setColor(1, 1, 0);
+	vertex p1(-c, 0, l, 0, 1, 0);
+	vertex p2(c, 0, l, 0, 1, 0);
+	vertex p3(c, 0, -l, 0, 1, 0);
+	vertex p4(-c, 0, -l, 0, 1, 0);
 
-	p.addTriangle(t1);
-	p.addTriangle(t2);
+	p.addPonto(p1); p.addPonto(p2); p.addPonto(p3); p.addPonto(p4);
+
+	p.addTriangulo(0, 1, 2);
+	p.addTriangulo(2, 3, 0);
 
 	return p;
 }
-primitive drawRectangule( float comprimento, float largura, float altura)
+primitiveVBO drawRectangule( float comprimento, float largura, float altura)  //Paralelipipedo
 {
-	primitive p;
+	primitiveVBO p;
 	float l = largura / 2, c = comprimento / 2, a = altura / 2;
 
 	vertex p1(-c, a, l);
@@ -38,158 +39,276 @@ primitive drawRectangule( float comprimento, float largura, float altura)
 	vertex p7(-c, -a, -l);
 	vertex p8(-c, a, -l);
 
-	p.addTriangle(triangle(p1, p2, p4));
-	p.addTriangle(triangle(p2, p3, p4));
-	p.addTriangle(triangle(p4, p3, p5));
-	p.addTriangle(triangle(p3, p6, p5));
-	p.addTriangle(triangle(p1, p4, p5));
-	p.addTriangle(triangle(p1, p5, p8));
-	p.addTriangle(triangle(p8, p7, p2));
-	p.addTriangle(triangle(p2, p1, p8));
-	p.addTriangle(triangle(p8, p5, p6));
-	p.addTriangle(triangle(p6, p7, p8));
-	p.addTriangle(triangle(p2, p7, p6));
-	p.addTriangle(triangle(p6, p3, p2));
+
+	p.addPonto(p1); p.addPonto(p2); p.addPonto(p3); p.addPonto(p4);
+	p.addPonto(p5); p.addPonto(p6); p.addPonto(p7); p.addPonto(p8);
+
+	p.addTriangulo(0, 1, 3);
+	p.addTriangulo(1, 2, 3);
+	p.addTriangulo(3, 2, 4);
+	p.addTriangulo(2, 5, 4);
+	p.addTriangulo(0, 3, 4);
+	p.addTriangulo(0, 4, 7);
+	p.addTriangulo(7, 6, 1);
+	p.addTriangulo(1, 0, 7);
+	p.addTriangulo(7, 4, 5);
+	p.addTriangulo(5, 6, 7);
+	p.addTriangulo(1, 6, 5);
+	p.addTriangulo(5, 2, 1);
 
 	return p;
 }
-primitive drawCube(float size) {
+primitiveVBO drawCube(float size) {
 	return drawRectangule(size, size, size);
 }
-primitive drawCilinder(float n_lados, float altura, float raio)
+primitiveVBO drawCilinder(float n_lados, float altura, float raio)
 {
-	primitive p;
+	primitiveVBO p;
 	float delta = 2 * PI / n_lados;
-	for (int count = 0; count < n_lados; count++) {
+	int j = 10; //numero de pontos por ciclos
+	int inc = 0;
+	for (int i = 0; i < n_lados; i++) {
 
-		//glColor3f(1, 0, 0);
+		inc=j*i;
+		
+		//topo   OT, PT, QT
+		vertex p0(0, altura / 2, 0); p0.setNormal(0.0f, 1.0f, 0.0f); //OT
+		vertex p1(raio*sin(delta*i), altura / 2, raio*cos(delta*i)); p1.setNormal(0.0f, 1.0f, 0.0f);//PT
+		vertex p2(raio*sin(delta*(i + 1)), altura / 2, raio*cos(delta*(i + 1))); p2.setNormal(0.0f, 1.0f, 0.0f);  //QT
 
-		vertex a(0, altura / 2, 0);  //O
-		vertex b(raio*sin((delta)*(count)), altura / 2, raio*cos((delta)*(count))); //P
-		vertex c(raio*sin((delta)*(count + 1)), altura / 2, raio*cos((delta)*(count + 1)));  //Q
+		//corpo P, P', Q | Q, P', Q'
+		vertex p3(raio*sin(delta*i), altura / 2, raio*cos(delta*i)); p3.setNormal(sin(delta*i), 0.0f, cos(delta*i));//P
+		vertex p4(raio*sin(delta*i), -altura / 2, raio*cos(delta*i)); p4.setNormal(sin(delta*i), 0.0f, cos(delta*i)); //P'
+		vertex p5(raio*sin(delta*(i + 1)), altura / 2, raio*cos(delta*(i + 1))); p5.setNormal(sin(delta*(i + 1)), 0.0f, cos(delta*(i + 1)));  //Q
+		vertex p6(raio*sin(delta*(i + 1)), -altura / 2, raio*cos(delta*(i + 1))); p6.setNormal(sin(delta*(i + 1)), 0, cos(delta*(i + 1)));  // Q'
 
-		//glColor3f(0, 1, 0);
-		vertex d(raio*sin((delta)*(count)), altura / 2, raio*cos((delta)*(count))); //P
-		vertex e(raio*sin((delta)*(count)), -altura / 2, raio*cos((delta)*(count)));  //P'
-		vertex f(raio*sin((delta)*(count + 1)), altura / 2, raio*cos((delta)*(count + 1)));  //Q
+		//base O'B, P'B, Q'B
+		vertex p7(0, -altura / 2, 0); p7.setNormal(0.0f, -1.0f, 0.0f);  // O'B
+		vertex p8(raio*sin(delta*i), -altura / 2, raio*cos(delta*i)); p8.setNormal(0.0f, -1.0f, 0.0f); //P'B
+		vertex p9(raio*sin(delta*(i + 1)), -altura / 2, raio*cos(delta*(i + 1))); p9.setNormal(0.0f, -1.0f, 0.0f);  // Q'B
+		
 
-		vertex g(raio*sin((delta)*(count + 1)), altura / 2, raio*cos((delta)*(count + 1)));  //Q
-		vertex h(raio*sin((delta)*(count)), -altura / 2, raio*cos((delta)*(count)));  //P'
-		vertex i(raio*sin((delta)*(count + 1)), -altura / 2, raio*cos((delta)*(count + 1)));  // Q'
 
-		//glColor3f(1, 0, 0);
-		vertex j(0, -altura / 2, 0);  // O'
-		vertex k(raio*sin((delta)*(count + 1)), -altura / 2, raio*cos((delta)*(count + 1)));  // Q'
-		vertex l(raio*sin((delta)*(count)), -altura / 2, raio*cos((delta)*(count)));  //P'
+		p.addPonto(p0); p.addPonto(p1); p.addPonto(p2);	p.addPonto(p3); p.addPonto(p4);
+		p.addPonto(p5); p.addPonto(p6); p.addPonto(p7); p.addPonto(p8); p.addPonto(p9);
 
-		triangle t1(a, b, c); t1.setColor(1, 0, 0);
-		triangle t2(d, e, f); t2.setColor(0, 1, 0);
-		triangle t3(g, h, i); t3.setColor(0, 1, 0);
-		triangle t4(j, k, l); t4.setColor(1, 0, 0);
-		p.addTriangle(t1); p.addTriangle(t2); p.addTriangle(t3); p.addTriangle(t4);
+		p.addTriangulo(inc + 0, inc + 1, inc + 2);
+		p.addTriangulo(inc + 3, inc + 4, inc + 5);
+		p.addTriangulo(inc + 5, inc + 4, inc + 6);
+		p.addTriangulo(inc + 7, inc + 8, inc + 9);
+
+	}
+	return p;
+
+}
+primitiveVBO drawDisc(float raioInt, float raioExt, float tesselacao)
+{
+	primitiveVBO p;
+
+
+	float alfa = (2 * PI ) / tesselacao;
+	float incr = 1.0f / tesselacao;
+	float inc = 0;
+	int j = 8;
+
+	for (int i = 0; i < tesselacao; i++) {
+
+		inc = j*i;
+
+		float y0 = 0;
+		
+		float x1 = raioInt*cos(i*alfa);
+		float z1 = raioInt*sin(i*alfa);
+		float x2 = raioExt*cos(i*alfa);
+		float z2 = raioExt*sin(i*alfa);
+		float x3 = raioInt*cos((i + 1)*alfa);
+		float z3 = raioInt*sin((i + 1)*alfa);
+		float x4 = raioExt*cos((i + 1)*alfa);
+		float z4 = raioExt*sin((i + 1)*alfa);
+
+		///FACE CIMA
+		vertex p0(x1, y0, z1, 0.0, -1.0, 0.0);
+		p0.setText2D(i*incr,0.0f);
+
+		vertex p1(x2, y0, z2, 0.0, -1.0, 0.0);
+		p1.setText2D(i*incr, 1.0f);
+
+		vertex p2(x3, y0, z3, 0.0, -1.0, 0.0);
+		p2.setText2D((i+1)*incr, 0.0f);
+
+		vertex p3(x4, y0, z4, 0.0, -1.0, 0.0);
+		p3.setText2D((i+1)*incr, 1.0f);
+
+		///FACE BAIXO
+		vertex p4(x1, y0, z1, 0.0, 1.0, 0.0);
+		p4.setText2D(i*incr, 0.0f);
+
+		vertex p5(x3, y0, z3, 0.0, 1.0, 0.0);
+		p5.setText2D((i + 1)*incr, 0.0f);
+
+		vertex p6(x2, y0, z2, 0.0, 1.0, 0.0);
+		p6.setText2D(i*incr, 1.0f);
+
+		vertex p7(x4, y0, z4, 0.0, 1.0, 0.0);
+		p7.setText2D((i + 1)*incr, 1.0f);
+
+		p.addPonto(p0); p.addPonto(p1); p.addPonto(p2);	p.addPonto(p3);
+		p.addPonto(p4); p.addPonto(p5); p.addPonto(p6);	p.addPonto(p7);
+
+		p.addTriangulo(inc + 0, inc + 1, inc + 2);
+		p.addTriangulo(inc + 2, inc + 1, inc + 3);
+		p.addTriangulo(inc + 4, inc + 5, inc + 6);
+		p.addTriangulo(inc + 6, inc + 5, inc + 7);
+
 	}
 	return p;
 }
-primitive drawCone(float n_lados, float altura, float raio)
+primitiveVBO drawCone(float n_lados, float altura, float raio)
 {
-	primitive p;
+	primitiveVBO p;
+	int nindices = 4;   //numero de indices adicionados por ciclo
+	int inc = 0;
+	int h = 0;
+
 	float delta = 2 * PI / n_lados;
 	for (int count = 0; count < n_lados; count++) {
-		vertex a(0, -altura / 2, 0);  //O
-		vertex b(raio*sin((delta)*(count + 1)), -altura / 2, raio*cos((delta)*(count + 1)));  //Q
-		vertex c(raio*sin((delta)*(count)), -altura / 2, raio*cos((delta)*(count))); //P
 
-		vertex d(0, altura / 2, 0);  //O
-		vertex e(raio*sin((delta)*(count)), -altura / 2, raio*cos((delta)*(count))); //P
-		vertex f(raio*sin((delta)*(count + 1)), -altura / 2, raio*cos((delta)*(count + 1)));  //Q
+		inc = nindices*h;
 
-		triangle t1(a, b, c);	t1.setColor(0, 0, 1);
-		triangle t2(d, e, f);	t2.setColor(0, 0, 1);
 
-		p.addTriangle(t1);
-		p.addTriangle(t2);
+
+		// O Q P
+		vertex p0(0, -altura / 2, 0); p0.setNormal(0.0f, 1.0f, 0.0f); //O
+		vertex p1(raio*sin((delta)*(count + 1)), -altura / 2, raio*cos((delta)*(count + 1))); p1.setNormal(sin(delta*(count + 1)), 0.0f, cos(delta*(count + 1))); //Q
+		vertex p2(raio*sin((delta)*(count)), -altura / 2, raio*cos((delta)*(count))); p2.setNormal(sin(delta*(count)), 0.0f, cos(delta*(count)));  //P
+
+		// O' P Q
+		vertex p3(0, altura / 2, 0); p3.setNormal(0.0f, 1.0f, 0.0f);  //O'
+
+
+		p.addPonto(p0); p.addPonto(p1); p.addPonto(p2);	p.addPonto(p3); 
+
+		p.addTriangulo(inc+0, inc+1, inc+2);
+		p.addTriangulo(inc+3, inc+2, inc+1);
+
+		h++;
 	}
 	return p;
 }
-primitive drawSphere(float raio, int fatias, int camadas)
+primitiveVBO drawSphere(float raio, int fatias, int camadas)
 {
-	primitive p;
+	primitiveVBO p;
+
+	int nindices = 4;   //numero de indices adicionados por ciclo
+	int inc = 0; 
+	int h = 0;
+
+	float incA = 2 * PI / fatias;
+	float incB = PI / camadas;
+	float x1, x2, x3, x4, y0, y1, z1, z2, z3, z4;
+
 	float alfa, beta;
-	float incA = 2 * PI / camadas;
-	float incB = PI / fatias;
-	float x0, xa, xb, x, y0, y, z0, za, zb, z;
 
-	for (alfa = 0.0; alfa < 2 * PI; alfa += incA) {
-		for (beta = -PI / 2; beta < PI / 2; beta += incB) {
+	for (int i = 0; i < fatias; i++) {
+		for (int j = 0; j < camadas; j++) {
+			alfa = incA*i;
+			beta = (-PI / 2.0f) + incB*j;
 
-			x0 = raio*cos(beta)*sin(alfa);
-			xa = raio*cos(beta)*sin(alfa + incA);
-			xb = raio*cos(beta + incB)*sin(alfa);
-			x = raio*cos(beta + incB)*sin(alfa + incA);
+			inc = nindices*h;
+
+			x1 = raio*cos(beta) * sin(alfa);
+			x2 = raio*cos(beta + incB) * sin(alfa);
+			x3 = raio*cos(beta) * sin(alfa + incA);
+			x4 = raio*cos(beta + incB) * sin(alfa + incA);
 
 			y0 = raio*sin(beta);
-			y = raio*sin(beta + incB);
+			y1 = raio*sin(beta + incB);
 
-			z0 = raio*cos(beta)*cos(alfa);
-			za = raio*cos(beta)*cos(alfa + incA);
-			zb = raio*cos(beta + incB)*cos(alfa);
-			z = raio*cos(beta + incB)*cos(alfa + incA);
+			z1 = raio * cos(beta) * cos(alfa);
+			z2 = raio * cos(beta + incB) * cos(alfa);
+			z3 = raio * cos(beta) * cos(alfa + incA);
+			z4 = raio * cos(beta + incB) * cos(alfa + incA);
 
-			vertex b(xb, y, zb);
-			vertex c(x0, y0, z0);
-			vertex d(xa, y0, za);
+			float tx, ty;
 
-			vertex f(xa, y0, za);
-			vertex g(x, y, z);
-			vertex h(xb, y, zb);
+			vertex p0(x1, y0, z1); p0.setNormal(x1 / raio, y0 / raio, z1 / raio);
+			tx = atan2(p0.getNx(), p0.getNz()) / (2. * PI) + 0.5;
+			ty = asin(p0.getNy()) / PI + .5;
+			p0.setText2D(tx, ty);
 
-			triangle t1(b, c, d); t1.setColor(0.5, 0, 0);
-			triangle t2(f, g, h); t2.setColor(1, 0, 0);
+			vertex p1(x3, y0, z3); p1.setNormal(x3 / raio, y0 / raio, z3 / raio);
+			tx = atan2(p1.getNx(), p1.getNz()) / (2. * PI) + 0.5;
+			ty = asin(p1.getNy()) / PI + .5;
 
-			p.addTriangle(t1);
-			p.addTriangle(t2);
+			if (tx < 0.75 && p0.getTx() > 0.75)
+				tx += 1.0;
+			else if (tx > 0.75 && p0.getTx() < 0.75)
+				tx -= 1.0;
+			p1.setText2D(tx, ty);
+
+			vertex p2(x2, y1, z2); p2.setNormal(x2 / raio, y1 / raio, z2 / raio);
+			tx = atan2(p2.getNx(), p2.getNz()) / (2. * PI) + 0.5;
+			ty = asin(p2.getNy()) / PI + .5;
+
+			if (tx < 0.75 && p1.getTx() > 0.75)
+				tx += 1.0;
+			else if (tx > 0.75 && p1.getTx() < 0.75)
+				tx -= 1.0;
+			p2.setText2D(tx, ty);
+
+			vertex p3(x4, y1, z4); p3.setNormal(x4 / raio, y1 / raio, z4 / raio);
+			tx = atan2(p3.getNx(), p3.getNz()) / (2. * PI) + 0.5;
+			ty = asin(p3.getNy()) / PI + .5;
+
+			if (tx < 0.75 && p2.getTx() > 0.75)
+				tx += 1.0;
+			else if (tx > 0.75 && p2.getTx() < 0.75)
+				tx -= 1.0;
+			p3.setText2D(tx, ty);
+
+
+			p.addPonto(p0); p.addPonto(p1); p.addPonto(p2);	p.addPonto(p3); 
+
+			p.addTriangulo(inc + 0, inc + 1, inc + 2);
+			p.addTriangulo(inc + 1, inc + 3, inc + 2);
+
+			h++;
 		}
 	}
 	return p;
 }
-
-primitive drawBezierSurface(string file, int tesselacao) {
-	primitive pri;
+primitiveVBO drawBezierSurface(string file, int tesselacao) {
+	primitiveVBO pri;
 	patchFile p = (file);
 
-	int** patches = p.getPatches();
-	float** vertices = p.getVertices();
+	pri = p.getprimitivaVBO(tesselacao);
 
-	int nj = p.get_NPatches();
-	int nv = p.get_NVertices();
-
-	vector<float> pontos = p.getpontosVBO(tesselacao);
-
-	for (int i = 0; i < pontos.size(); i=i+9)
-	{
-		int j = 0;
-		vertex v1 (pontos[i+(j++)],pontos[i+(j++)],pontos[i+(j++)]);
-		vertex v2 (pontos[i+(j++)], pontos[i+(j++)], pontos[i+(j++)]);
-		vertex v3 (pontos[i+(j++)], pontos[i+(j++)], pontos[i+(j++)]);
-		pri.addTriangle(triangle(v1, v2, v3));
-	}
 	return pri;
 }
-
-
 
 
 static void show_usage()
 {
 	std::cerr << endl << "\nUsage: primitiva <options> <filename.txt>\n" << endl << "cilindro <lados altura raio>" << endl <<
 		"cone <lados altura raio>" << endl << "cubo <aresta>" << endl << "paralelipipedo <comprimento largura altura>" << endl <<
-		"plano <comprimento largura>" << endl << "esfera <raio fatias camadas>\n" << "supBezier <ficheiro .patch tesselacao>" << endl;  
+		"plano <comprimento largura>" << endl << "esfera <raio fatias camadas>" << endl << "disco <raio_interior raio_exterior tesselacao>" << endl << "supBezier <ficheiro .patch tesselacao>" << endl;
 }
 
 
 int main(int argc, char **argv) {
-	primitive p;
+	primitiveVBO p;
 
+	//p = drawCilinder(16.0, 2.0, 1.0);
+	//p = drawCone(16, 2, 1);
+	//p = drawSphere (1, 16, 16);
+	//p = drawBezierSurface("teapot.patch", 5);
+	//p.saveFile("teste.txt");
+
+//	primitiveVBO a;
+//	a.loadFile("teste.txt");
+
+
+	
 	if (argc == 1) show_usage();
 	else {
 		for (int i = 1; i < argc; ++i) {
@@ -312,8 +431,29 @@ int main(int argc, char **argv) {
 					}
 				}
 			}
+			else if (arg == "disco") {
+				string err = "\n-- Erro -- Argumentos invalidos\nUsage: disco <raio_interior raio_exterior tesselacao> <filename>\n";
+				if (argc != 6){
+					std::cerr << err;
+				}
+				else{
+					try{
+						float raioInt = stof(argv[i + 1]);
+						float raioExt = stof(argv[i + 2]);
+						int tesselacao = atoi(argv[i + 3]);
+						string file = argv[i + 4];
+						p = drawDisc(raioInt, raioExt, tesselacao);
+						p.saveFile(file);
+
+					}
+					catch (invalid_argument)
+					{
+						std::cerr << err;
+					}
+				}
+			}
 			else if (arg == "supBezier") {
-				string err = "\n-- Erro -- Argumentos invalidos\nUsage: supBezier <ficheiro.patch tesselacao>\n";
+				string err = "\n-- Erro -- Argumentos invalidos\nUsage: supBezier <ficheiro.patch tesselacao> <filename>\n";
 				if (argc != 5){
 					std::cerr << err;
 				}

@@ -84,7 +84,6 @@
   <ItemGroup>
     <ClCompile Include="catmull-rom.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Teste.cpp" />
     <ClCompile Include="TinyXml\tinystr.cpp" />
     <ClCompile Include="TinyXml\tinyxml.cpp" />
     <ClCompile Include="TinyXml\tinyxmlerror.cpp" />

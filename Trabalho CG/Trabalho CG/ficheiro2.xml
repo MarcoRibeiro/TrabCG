@@ -1,0 +1,7 @@
+<cena>
+<grupo>
+<modelos>
+<modelo ficheiro=esfera.txt diffR=1 diffG=0 diffB=0 speR=0 speG=1 speB=0 emiR=0.8 emiG=0.8 emiB=0.15 shininess=80 />
+</modelos>
+</grupo>
+</cena>		

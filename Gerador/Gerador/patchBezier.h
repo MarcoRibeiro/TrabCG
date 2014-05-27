@@ -210,46 +210,6 @@ public:
 	}
 
 
-/*
-NÃO UTILIZADO
-t -> posicao (0-1)
-res -> variavel onde é devolvida o resultado ou seja as coordenadas x y z
-p -> pontos de controle da curva
-
-retorna uma determinada posição na curva
-*/
-void getBezierPoint(float **p,float t, float *res) {
-
-	// beziermatrix
-	float m[4][4] = { { -1.0f, 3.0f, -3.0f, 1.0f },
-	{ 3.0f, -6.0f, 3.0f, 0.0f },
-	{ -3.0f, 3.0f, 0.0f, 0.0f },
-	{ 1.0f, 0.0f, 0.0f, 0.0f } };
-
-	res[0] = 0.0; res[1] = 0.0; res[2] = 0.0;
-	// Calcular o ponto res = T * M * P
-
-
-	float t3[4] = { t*t*t, t*t, t, 1 };
-	float tparcial = 0;
-	float aux = 0;
-
-
-	for (int k = 0; k < 3; k++){
-		aux = 0;
-		for (int i = 0; i < 4; i++) {
-			tparcial = 0;
-			for (int j = 0; j < 4; j++) {
-				tparcial += t3[j] * m[j][i];
-			}
-			aux += tparcial * p[i][k];
-		}
-		res[k] = aux;
-	}
-
-}
-
-
 
 /*
 Dado um patch retorna uma matrix 4x12 com todos os pontos
@@ -273,14 +233,17 @@ float** getPontosPatch(int* patch, float** vertices)
 	return pontos;
 }
 
+float length(float x, float y, float z) {
+	return sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
+}
 
 /*
-Dado uma matrix 4x12 com todos os pontos de controle e grau de tesselação retorna um array com as coordenadas do ponto
+Dado uma matrix 4x12 com todos os pontos de controle e um determinado ponto de tesselação retorna um array com as coordenadas do ponto
 p-> matriz de pontos de controle - Matriz 4x12 contem todas as coordenadas dos 4 pontos
-u e v -> grau de tesselação [0..1]
+u e v -> ponto de tesselação [0..1]
 res variavel onde vao ser guardados as coordenadas do ponto calculado
 */
-void getBezierPointSurface(float **p, float u, float v, float *res) {
+vertex getBezierPointSurface(float **p, float u, float v) {
 
 	// beziermatrix
 	float m[4][4] = { { -1.0f, 3.0f, -3.0f, 1.0f },
@@ -288,9 +251,13 @@ void getBezierPointSurface(float **p, float u, float v, float *res) {
 	{ -3.0f, 3.0f, 0.0f, 0.0f },
 	{ 1.0f, 0.0f, 0.0f, 0.0f } };
 
+	float res[3];
+	float norm[3];
 	res[0] = 0.0; res[1] = 0.0; res[2] = 0.0;
-	// Calcular o ponto res = T * M * P
+	norm[0] = 0.0; norm[1] = 0.0; norm[2] = 0.0;
 
+	
+	// Calcular o ponto res = T * M * P
 
 	float u3[1][4] = { u*u*u, u*u, u, 1 };
 	float v3[1][4] = { v*v*v, v*v, v, 1 };
@@ -339,81 +306,29 @@ void getBezierPointSurface(float **p, float u, float v, float *res) {
 		{
 			tmp4 += tmp3[0][i] * v3T[i][0];
 		}
+
 		res[j] = tmp4;
 		tmp4 = 0;
 	}
+	float norma = length(res[0], res[1], res[2]); //norma do vector
+
+	for (int i = 0; i < 3;i++)  //calcula normais
+		norm[i] = res[i] / norma;
+
+	vertex ret(res[0], res[1], res[2], norm[0], norm[1], norm[2]);
+	return ret;
 }
 
 
-/*
-NÃO UTILIZADO
-Dados os pontos de controle de uma cruva Bezier desenha a curva
-*/
-void renderBezierCurve(float **p) {
 
-	// desenhar a curva usando segmentos de reta - GL_LINE_LOOP
-
-	float n_pontos = 100;
-	float res[3];
-	float inc = 1 / n_pontos;
-	float f = 0;
-
-	glBegin(GL_LINE_LOOP);
-	for (int a = 0; a <= n_pontos; a++)
-	{
-
-		getBezierPoint(p,f, res);
-		glVertex3fv(res);
-		f += inc;
-	}
-	glEnd();
-}
-
-
-/*
-NÃO UTILIZADO
-Dados varios patches desenha todas as curvas de Bezier
-*/
-void renderBezierCurves()
+primitiveVBO getprimitivaVBO(int tesselacao)
 {
+	primitiveVBO p;
 
-	//inicializa variavel pontos
-	float **pontos = (float**)malloc(4 * sizeof(float*));
-	for (int i = 0; i < 4; i++)
-		pontos[i] = (float*) malloc(3 * sizeof(float));
+	int nindices = 4;   //numero de indices adicionados por ciclo
+	int incr = 0;
+	int a = 0;
 
-
-	for (int patchno = 0; patchno < npatches; patchno++) {
-		for (int i = 0, inc=0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				int indice = patches[patchno][j+inc];
-				pontos[j][0] = vertices[indice][0];
-				pontos[j][1] = vertices[indice][1];
-				pontos[j][2] = vertices[indice][2];
-			}
-			renderBezierCurve(pontos);
-			inc += 4;
-		}
-		patchno = npatches;
-	}
-}
-
-
-
-/*
-NÃO UTILIZADO
-Imprime no ecrâ a superficie de bezier fornecida em patches e vertices USANDO GLVERTEX3F
-patches -> vector com todos os patches
-vertices -> vector com os vertices
-npatches -> numero de patches
-nvertices -> numero de vertices
-tesselacao -> grau de tesselacao
-*/
-void RenderBezierSurface(int tesselacao) {
-
-	float x, y, z;  //usado para guardar temporariamente os resultados de getBezierPointSurface
-
-	float res[3]; // variavel onde vao ser guardados os resultados
 
 	float delta = 1.0f / tesselacao;  //coeficiente de tesselacao
 
@@ -427,124 +342,42 @@ void RenderBezierSurface(int tesselacao) {
 		{
 			for (int i = 0; i < tesselacao; i++)
 			{
-				glColor3f(1, 0, 0);
-				glBegin(GL_TRIANGLES);
+				incr = nindices*a;
 
-					u = i*delta;
-					v = inc;
-					getBezierPointSurface(pontos, u, v, res);
-					x = res[0];	y = res[1];	z = res[2];
-					glVertex3f(x, y, z);
-
-					u = i*delta;
-					v = inc + delta;
-					getBezierPointSurface(pontos, u, v, res);
-					x = res[0];	y = res[1];	z = res[2];
-					glVertex3f(x, y, z);
-
-					u = (i + 1)*delta;
-					v = inc;
-					getBezierPointSurface(pontos, u, v, res);
-					x = res[0];	y = res[1];	z = res[2];
-					glVertex3f(x, y, z);
-					glEnd();
-
-				glBegin(GL_TRIANGLES);
-
-					u = (i + 1)*delta;
-					v = inc;
-					getBezierPointSurface(pontos, u, v, res);
-					x = res[0];	y = res[1];	z = res[2];
-					glVertex3f(x, y, z);
-
-					u = i*delta;
-					v = inc + delta;
-					getBezierPointSurface(pontos, u, v, res);
-					x = res[0];	y = res[1];	z = res[2];
-					glVertex3f(x, y, z);
-
-					u = (i + 1)*delta;
-					v = delta + inc;
-					getBezierPointSurface(pontos, u, v, res);
-					x = res[0];	y = res[1];	z = res[2];
-					glVertex3f(x, y, z);
-
-				glEnd();
-			}
-			inc += delta;
-		}
-		inc = 0;
-	}
-}
-
-
-vector<float> getpontosVBO(int tesselacao)
-{
-	vector<float> ret;
-
-	float res[3]; // variavel onde vao ser guardados os resultados
-
-	float delta = 1.0f / tesselacao;  //coeficiente de tesselacao
-
-	float u = 0, v = 0; //coordenadas(tesselacao) que vao ser calculadas
-	float inc = 0;
-
-	for (int h = 0; h < npatches; h++) {
-
-		float **pontos = getPontosPatch(patches[h], vertices);
-		for (int j = 0; j < tesselacao; j++)
-		{
-			for (int i = 0; i < tesselacao; i++)
-			{
-				//PRIMEIRO TRIANGULO
+				//PRIMEIRO TRIANGULO   P Q O
 				u = i*delta;
 				v = inc;
-				getBezierPointSurface(pontos, u, v, res);
-				ret.push_back(res[0]);
-				ret.push_back(res[1]);
-				ret.push_back(res[2]);
+				vertex p0 = getBezierPointSurface(pontos, u, v);  // P = i*delta,inc
 
 				u = i*delta;
 				v = inc + delta;
-				getBezierPointSurface(pontos, u, v, res);
-				ret.push_back(res[0]);
-				ret.push_back(res[1]);
-				ret.push_back(res[2]);
+				vertex p1 = getBezierPointSurface(pontos, u, v);  // Q = i*delta,inc+delta
 
 				u = (i + 1)*delta;
 				v = inc;
-				getBezierPointSurface(pontos, u, v, res);
-				ret.push_back(res[0]);
-				ret.push_back(res[1]);
-				ret.push_back(res[2]);
+				vertex p2 = getBezierPointSurface(pontos, u, v);  // O = (i+1)*delta,inc
 
-				//SEGUNDO TRIANGULO
-				u = (i + 1)*delta;
-				v = inc;
-				getBezierPointSurface(pontos, u, v, res);
-				ret.push_back(res[0]);
-				ret.push_back(res[1]);
-				ret.push_back(res[2]);
 
-				u = i*delta;
-				v = inc + delta;
-				getBezierPointSurface(pontos, u, v, res);
-				ret.push_back(res[0]);
-				ret.push_back(res[1]);
-				ret.push_back(res[2]);
+				//SEGUNDO TRIANGULO		O Q R
 
+	
 				u = (i + 1)*delta;
 				v = delta + inc;
-				getBezierPointSurface(pontos, u, v, res);
-				ret.push_back(res[0]);
-				ret.push_back(res[1]);
-				ret.push_back(res[2]);
+				vertex p3 = getBezierPointSurface(pontos, u, v); // R = (i+1)*delta, delta+inc
+
+				p.addPonto(p0); p.addPonto(p1); p.addPonto(p2);  p.addPonto(p3); 
+
+
+				p.addTriangulo(incr+0, incr+1, incr+2);
+				p.addTriangulo(incr+2, incr+1, incr+3);
+
+				a++;
 			}
 			inc += delta;
 		}
 		inc = 0;
 	}
-	return ret;
+	return p;
 }
 
 };

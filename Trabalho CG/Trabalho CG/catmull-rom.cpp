@@ -60,6 +60,9 @@ void renderCatmullRomCurve(float** p, int point_count) {
 	float inc = 1 / n_pontos;
 	float f = 0;
 
+
+	glDisable(GL_LIGHTING);
+	glColor3f(0.5, 0.5, 0.5);
 	glBegin(GL_LINE_LOOP);
 	for (int a = 0; a < n_pontos; a++)
 	{
@@ -68,4 +71,6 @@ void renderCatmullRomCurve(float** p, int point_count) {
 		glVertex3fv(res);
 	}
 	glEnd();
+	glEnable(GL_LIGHTING);
+
 }
