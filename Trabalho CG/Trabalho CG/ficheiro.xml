@@ -1,4 +1,7 @@
 <cena>
+<luzes>
+	<luz tipo=POINT posX=0 posY=0 posZ=0/>
+</luzes>
 <grupo>
 	<translacao Y=0.2 />
 	<escala X=0.8 Y=0.8 Z=0.8 />

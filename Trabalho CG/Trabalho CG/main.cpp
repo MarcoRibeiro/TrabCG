@@ -24,6 +24,7 @@ GLuint* texID;    //buffer texturas
 GLuint textBackground = 100;
 bool background = true;
 
+bool lights_on = false;
 int GLprimitiva=0;
 
 //variavel que vai conter o ficheiro xml inicializado a ""
@@ -39,7 +40,9 @@ int w = 70, h = 70; // usado para setOrthographicProjection
 
 //MOVIMENTO DA CAMARA
 
-float alfa = 0;  
+float alfa = -M_PI;  
+float delta = 0;
+float raio = -1;
 
 //MOVIMENTO CAMARA
 float centerX = 0.0f, centerY = 0.0f, centerZ = 0.0f;
@@ -235,6 +238,49 @@ void readGrupo(TiXmlElement* grupo) {
 	c.addTransf(new ppMatrix());
 }
 
+void readLuzes(TiXmlElement* luzes) {
+	for (TiXmlElement* elem = luzes->FirstChildElement(); elem != NULL; elem = elem->NextSiblingElement()) {
+		string elemName = elem->Value();
+		const char* attr;
+		if (elemName == "luz") {
+			GLfloat r = 1, g = 1, b = 1; // DEFAULT VALUES
+			GLfloat x = 0, y = 0, z = 0;
+			GLfloat sx = 0, sy = 0, sz = 0;
+			int mode=POINT;
+			GLenum type=GL_DIFFUSE;
+			attr = elem->Attribute("tipo"); //POINT DIRECTIONAL SPOTLIGHT
+			if (elem->QueryFloatAttribute("posX", &x) == TIXML_SUCCESS &&
+				elem->QueryFloatAttribute("posY", &y) == TIXML_SUCCESS &&
+				elem->QueryFloatAttribute("posZ", &z) == TIXML_SUCCESS) {
+			}
+			if (elem->QueryFloatAttribute("sX", &sx) == TIXML_SUCCESS &&
+				elem->QueryFloatAttribute("sY", &sy) == TIXML_SUCCESS &&
+				elem->QueryFloatAttribute("sZ", &sz) == TIXML_SUCCESS) {
+			}
+			if (elem->QueryFloatAttribute("diffR", &r) == TIXML_SUCCESS &&
+				elem->QueryFloatAttribute("diffG", &g) == TIXML_SUCCESS &&
+				elem->QueryFloatAttribute("diffB", &b) == TIXML_SUCCESS) {
+				type = GL_DIFFUSE;
+			}
+			if (elem->QueryFloatAttribute("speR", &r) == TIXML_SUCCESS &&
+				elem->QueryFloatAttribute("speG", &g) == TIXML_SUCCESS &&
+				elem->QueryFloatAttribute("speB", &b) == TIXML_SUCCESS) {
+				type = GL_SPECULAR;
+			}
+			if (elem->QueryFloatAttribute("ambR", &r) == TIXML_SUCCESS &&
+				elem->QueryFloatAttribute("ambG", &g) == TIXML_SUCCESS &&
+				elem->QueryFloatAttribute("ambB", &b) == TIXML_SUCCESS) {
+				type = GL_AMBIENT;
+			}
+
+			if (strcmp(attr,"POINT")==0) { mode = POINT; }
+			else if (strcmp(attr, "DIRECTIONAL") == 0) { mode = DIRECTIONAL;  }
+			else if (strcmp(attr, "SPOTLIGHT") == 0) { mode = SPOTLIGHT;  }
+			c.addLight(new light(type, mode, r, g, b, x, y, z, sx, sy, sz));
+		}
+	}
+}
+
 // Carrega em memoria todos as primitivas e transformações de um ficheiro Xml (usa readGrupo e readModelos)
 void readXml(string ficheiro) {
 	TiXmlDocument doc;
@@ -245,6 +291,10 @@ void readXml(string ficheiro) {
 		if (elemName == "grupo")
 		{
 			readGrupo(elem);
+		}
+		else if (elemName == "luzes")
+		{
+			readLuzes(elem);
 		}
 	}
 }
@@ -283,14 +333,15 @@ void loadTexture(ILstring file, GLuint Tid) {
 }
 
 /*
-retorna indice dos buffers
+Copia uma primitiva para a placa gráfica e 
+retorna o indice do buffer em que ficou guardada
 */
 int loadPrimitive(primitiveVBO* p)
 {
 
-	p->setBuffer(GLprimitiva);
+	p->setBuffer(GLprimitiva); //armazena na propria primitiva o buffer que vai ficar associado
+	
 	vector<vertex> vertices = p->getPontos();
-
 
 	vector<float> pontos;
 	vector<float> pnormais;
@@ -326,7 +377,7 @@ void iniciaVBO() {
 	vector<modelo*> modelos = c.getModelos();
 	vector<primitiveVBO*> primitivas = c.getPrimitivas();
 	int n_primitivas = c.getN_primitivas();  //numero de objectos
-	int n_texturas = c.getNtexturas();
+	int n_texturas = c.getNtexturas(); //numero de texturas diferentes
 
 	int lastloadedPrimitive = -1;
 
@@ -350,34 +401,31 @@ void iniciaVBO() {
 	int i = 0;  //nº de texturas
 
 	for (vector<modelo*>::iterator it = modelos.begin(); it != modelos.end(); it++) {
-		bool text = false;
+
 		int id = (*it._Ptr)->getId();
 
 		if (id > lastloadedPrimitive)  // se ainda não foi carregada a primitiva
 		{
 			if ((*it._Ptr)->getTextura() != "") {
-				text = true;
 				loadTexture((ILstring)(*it._Ptr)->getTextura().c_str(), texID[i]);
+				(*it._Ptr)->setBufferText(i++);
 			}
 
 			int p = loadPrimitive(primitivas[id]);  //a primitva fica guardada nos buffers com pos p
-			(*it._Ptr)->setBuffer(p);
+			(*it._Ptr)->setBuffer(p); //guarda no modelo qual o buffer da primitiva associada
 			
-			if(text==true) (*it._Ptr)->setBufferText(i++);
-
 			lastloadedPrimitive++;
 		}
 		else
 		{
 			if ((*it._Ptr)->getTextura() != "") {
-				text = true;
 				loadTexture((ILstring)(*it._Ptr)->getTextura().c_str(), texID[i]);
+				(*it._Ptr)->setBufferText(i++);
 			}
 
-			int p = primitivas[id]->getBuffer();
+
+			int p = primitivas[id]->getBuffer(); //procura na primitiva qual o buffer em que ficou guardada
 			(*it._Ptr)->setBuffer(p); 
-			
-			if (text == true) (*it._Ptr)->setBufferText(i++);
 		}
 	}
 }
@@ -432,10 +480,10 @@ void drawCenaVBO(cena c)
 			
 
 			vector<material> materiais = p->getMateriais();
-			if (materiais.size() != 0) {
+			if (materiais.size() != 0) { // se tiver materiais, desenha
 				drawMateriais(materiais); mat = true;
 			}
-			else if (mat == true) {
+			else if (mat == true) { // caso anteriormente tenham sido desenhados materiais, limpa
 				clearMaterials();
 				mat = false;
 			}
@@ -452,7 +500,7 @@ void drawCenaVBO(cena c)
 			glBindBuffer(GL_ARRAY_BUFFER,  texCoord[p->getBuffer()]);
 			glTexCoordPointer(2, GL_FLOAT, 0, 0);
 
-			if (p->getBufferText() != -1) 
+			if (p->getBufferText() != -1) // Se modelo tiver textura, desenha
 				glBindTexture(GL_TEXTURE_2D, texID[p->getBufferText()]);
 			
 			glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, &indices[0]);
@@ -507,16 +555,9 @@ float* prodExterno(float* va, float* vb) {
 
 	float *res = (float*)malloc(sizeof(float)* 3); // resultado
 
-	
-
-	float x = (va[1] * vb[2]) - (va[2] * vb[1]);		//produto externo
-	float y = -1 * ((va[0] * vb[2]) - (va[2] * vb[0]));
-	float z = (va[0] * vb[1]) - (va[1] * vb[0]);
-
-
-	res[0] = x;
-	res[1] = y;
-	res[2] = z;
+	res[0] = (va[1] * vb[2]) - (va[2] * vb[1]);		//produto externo
+	res[1] = (va[2] * vb[0]) - (va[0] * vb[2]);
+	res[2] = (va[0] * vb[1]) - (va[1] * vb[0]);
 
 	return res;
 }
@@ -550,96 +591,70 @@ void displayBackground()
 	glEnable(GL_LIGHTING);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(45.0, (GLfloat)wwidth / (GLfloat)wheigth, 0.1, 1000.0);
+	gluPerspective(45.0, (GLfloat)wwidth / (GLfloat)wheigth, 0.001f, 1000.0);
 	glMatrixMode(GL_MODELVIEW);
 
 }
+
+void drawLights(vector<light*> luzes)
+{
+	GLenum light0 = GL_LIGHT0;
+	for (vector<light*>::iterator it = luzes.begin(); it != luzes.end(); ++it)
+	{
+		glEnable(light0);
+		glLightfv(light0, GL_POSITION, (*it._Ptr)->getPos());
+		if ((*it._Ptr)->getMode()==9)
+			glLightfv(light0, GL_SPOT_DIRECTION, (*it._Ptr)->getSpotLightDirection());
+		glLightfv(light0, (*it._Ptr)->getType(), (*it._Ptr)->getColor());
+		light0++;
+	}
+}
+
 void renderScene(void) {
 	float fps;
 	int time;
 
 	// clear buffers
-
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if (background == true) displayBackground();
 
+	//background
+	if (background == true)
+		displayBackground();
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// set the camera
 	glLoadIdentity();
-
-
-
 	gluLookAt(camX, camY, camZ,
 		centerX, centerY, centerZ,
 		upX, upY, upZ);
 
+	//Coloca luzes
+	vector<light*>luzes = c.getLights();
+	if ((luzes.size() != 0) && (lights_on == false)) {
+		drawLights(luzes); lights_on = true;
+	}
+	
 
-
-	GLfloat whiteSpecularLight[] = { 1.0, 1.0, 1.0 };
-	GLfloat mat_specular[] = { 0.8, 0.8, 0.15, 1.0 };
-	GLfloat mat_shininess[] = { 90.0 };
-	GLfloat light_position[] = { 0.0, 0.0, 0.0, 1.0 };
-
-
-	GLfloat redDiffuseMaterial[] = { 1.0,1.0,1.0};
-
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-	GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 0.0 };
-
-	glLightfv(GL_LIGHT0, GL_AMBIENT_AND_DIFFUSE, whiteSpecularLight);
-//	glLightfv(GL_LIGHT0, GL_SPECULAR, light_diffuse);
-
-	//glLightfv(GL_LIGHT0, GL_EMISSION, mat_specular);
-
-
-	//glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, redDiffuseMaterial);
-	//glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mat_specular);
-	//glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
-
-
-	//inserir instruções de desenho
-
-	//glDisable(GL_LIGHTING);
-
-	//glColor3f(1, 0, 1);
-
-	//glutSolidSphere(1, 10, 10);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-
+	//Desenha cena
 	drawCenaVBO(c);
 
+//	glEnable(GL_LIGHT0);
+//GLfloat diff[3] = { 1.0, 0.0, 0.0 };
+//	GLfloat p[] = { 0, 0, 0, 1 };
+//	glLightfv(GL_LIGHT0, GL_POSITION, p);
 
+	//glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);
 
+	//glutSolidSphere(1,10,10);
 
+	// Rato
 	switch (linhas) {
 	case 0: glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); break;
 	case 1: glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); break;
 	case 2: glPolygonMode(GL_FRONT_AND_BACK, GL_POINT); break;
 	}
-
-
-
-	/*
-	///////////IMPRESSAO AJUDA/////////////////
-	glDisable(GL_LIGHTING);
 	
-	setOrthographicProjection();
-	glPushMatrix();
-	glLoadIdentity();
-	glColor3f(1, 1, 1);
-
-	renderSpacedBitmapString(1, 2, 1, (void*)font1, " Zoom in: <a>   Zoom out: <z>   Camara: <up> <down> <left> <right>");
-
-	glPopMatrix();
-	resetPerspectiveProjection();
-	
-	glEnable(GL_LIGHTING);
-	*/
-	
-
 	//////////////// FPS ///////////////////////
 	frame++;
 	time = glutGet(GLUT_ELAPSED_TIME);
@@ -671,65 +686,75 @@ void sK(int codigo, int x, int y){
 	{
 
 	case GLUT_KEY_RIGHT:
-		camX += 0.02*vr[0];
-		camY += 0.02*vr[1];
-		camZ += 0.02*vr[2];
-		centerX += 0.02*vr[0];
-		centerY += 0.02*vr[1];
-		centerZ += 0.02*vr[2];
+		camX += 0.015*vr[0];
+		camY += 0.015*vr[1];
+		camZ += 0.015*vr[2];
+		centerX += 0.015*vr[0];
+		centerY += 0.015*vr[1];
+		centerZ += 0.015*vr[2];
 		break;
 	case GLUT_KEY_LEFT:
-		camX -=	0.02*vr[0];
-		camY -= 0.02*vr[1];
-		camZ -= 0.02*vr[2];
-		centerX -= 0.02*vr[0];
-		centerY -= 0.02*vr[1];
-		centerZ -= 0.02*vr[2];
+		camX -=	0.015*vr[0];
+		camY -= 0.015*vr[1];
+		camZ -= 0.015*vr[2];
+		centerX -= 0.015*vr[0];
+		centerY -= 0.015*vr[1];
+		centerZ -= 0.015*vr[2];
 		break;
 	case GLUT_KEY_UP:
-		camX += 0.02*d[0];
-		camY += 0.02*d[1];
-		camZ += 0.02*d[2];
-		centerX += 0.02*d[0];
-		centerY += 0.02*d[1];
-		centerZ += 0.02*d[2];
+		camX += 0.015*d[0];
+		camY += 0.015*d[1];
+		camZ += 0.015*d[2];
+		centerX += 0.015*d[0];
+		centerY += 0.015*d[1];
+		centerZ += 0.015*d[2];
 		break;
 	case GLUT_KEY_DOWN:
-		camX -= 0.02*d[0];
-		camY -= 0.02*d[1];
-		camZ -= 0.02*d[2];
-		centerX -= 0.02*d[0];
-		centerY -= 0.02*d[1];
-		centerZ -= 0.02*d[2];
+		camX -= 0.015*d[0];
+		camY -= 0.015*d[1];
+		camZ -= 0.015*d[2];
+		centerX -= 0.015*d[0];
+		centerY -= 0.015*d[1];
+		centerZ -= 0.015*d[2];
 		break;
 	case GLUT_KEY_PAGE_UP:
-		camX += 0.02*up[0];
-		camY += 0.02*up[1];
-		camZ += 0.02*up[2];
-		centerX += 0.02*up[0];
-		centerY += 0.02*up[1];
-		centerZ += 0.02*up[2];
+		camX += 0.015*up[0];
+		camY += 0.015*up[1];
+		camZ += 0.015*up[2];
+		centerX += 0.015*up[0];
+		centerY += 0.015*up[1];
+		centerZ += 0.015*up[2];
 		break;
 	case GLUT_KEY_PAGE_DOWN:
-		camX -= 0.02*up[0];
-		camY -= 0.02*up[1];
-		camZ -= 0.02*up[2];
-		centerX -= 0.02*up[0];
-		centerY -= 0.02*up[1];
-		centerZ -= 0.02*up[2];
+		camX -= 0.015*up[0];
+		camY -= 0.015*up[1];
+		camZ -= 0.015*up[2];
+		centerX -= 0.015*up[0];
+		centerY -= 0.015*up[1];
+		centerZ -= 0.015*up[2];
 		break;
 	}
 		glutPostRedisplay();
 }
 void kP(unsigned char codigo, int x, int y)
 	{
+	float p[3] = { camX, camY, camZ };
+	float l[3] = { centerX, centerY, centerZ };
+	float up[3] = { upX, upY, upZ };
+	float* d = getPontoD(l, p);
+	if(raio == -1)  raio = sqrt(pow(d[0], 2) + pow(d[1], 2) + pow(d[2], 2));
+	float inc = (2 * M_PI) / 200;
 		switch(codigo)
 		{
 		case 'a':
-			centerX -= 0.1;
+			alfa += inc;
+			centerX = raio*sin(alfa);
+			centerZ = raio*cos(alfa);
 			break;
 		case 'd':
-			centerX += 0.1;
+			alfa -= inc;
+			centerX = raio*sin(alfa);
+			centerZ = raio*cos(alfa);
 			break;
 		case 'b':
 			if (background == true) background = false;
@@ -745,11 +770,16 @@ void kP(unsigned char codigo, int x, int y)
 
 			break;
 		case 'w':
-			centerY += 0.1;
-
+			delta += inc;
+			if (delta > (M_PI / 2.0f))
+				delta = (M_PI / 2.0f);
+			centerY = raio*sin(delta);
 			break;
 		case 's':
-			centerY -= 0.1;
+			delta -= inc;
+			if (delta < -(M_PI / 2.0f))
+				delta = -(M_PI / 2.0f);
+			centerY = raio*sin(delta);
 
 			break;
 		}
@@ -825,16 +855,10 @@ void processMouseMotion(int xx, int yy)
 void menu(int opcao) {
 		switch (opcao)
 		{
-		case 1:
-			linhas = MNU_LINHAS;
-			break;
-		case 2:
-			linhas = MNU_OPACO;
-			break;
-		case 3:
-			linhas = MNU_PONTOS;
-		case 4:
-			 
+		case 1: 	linhas = MNU_LINHAS;	break;
+		case 2:		linhas = MNU_OPACO;		break;
+		case 3:		linhas = MNU_PONTOS;
+		case 4:	 
 			if (tanslationLines) tanslationLines = false;
 			else tanslationLines = true;
 			break;
@@ -856,10 +880,8 @@ void initGL() {
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
 
 	glEnable(GL_NORMALIZE);
-
 	glEnable(GL_TEXTURE_2D);
 }
 
@@ -892,7 +914,11 @@ int main(int argc, char **argv) {
 // carrega o ficheiro para a estrutura
 	readXml(file);
 
+
+	//carrega a textura de background
 	loadTexture((ILstring)"background.jpg", textBackground);
+
+
 
 
 	a = glutGet(GLUT_ELAPSED_TIME) - t;
@@ -914,7 +940,7 @@ int main(int argc, char **argv) {
 	glutSpecialFunc(sK);
 	glutKeyboardFunc(kP);
 
-	// pôr aqui registo da funções do rato
+// pôr aqui registo da funções do rato
 	glutMouseFunc(processMouseButtons);
 	glutMotionFunc(processMouseMotion);
 

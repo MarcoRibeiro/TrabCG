@@ -13,6 +13,9 @@ using namespace std;
 #define TYPE_SPECULAR 4;
 #define TYPE_AMB_AND_DIFF 5;
 #define TYPE_SHININESS 6;
+#define POINT 7;
+#define DIRECTIONAL 8;
+#define SPOTLIGHT 9;
 
 class vertex {
 
@@ -348,6 +351,7 @@ class modelo : public drawable{
 	short type;
 	int buffer,btext; //buffer associado a pontos, normais e coordenadas, e buffer texid
 	vector<material> mat;
+	vector<transf*> transformacoes;
 
 public:
 
@@ -392,6 +396,15 @@ public:
 		setType(TYPE_PRIMITIVE);
 		mat = m;
 	}
+
+	void addTransf(transf* t)
+	{
+		transformacoes.push_back(t);
+	}
+	void addTransf(vector<transf*> t)
+	{
+		transformacoes = t;
+	}
 	
 	string getNome() {
 		return nome;
@@ -431,48 +444,73 @@ public:
 	}
 };
 
-class lights {
+class light {
 
 	GLfloat color[3];
-	GLfloat pos[4];
-	int type;
+	GLfloat pos[4];	
+	GLfloat spot_direction[3];
+	GLenum type; // 1->Diffuse 3->Ambient 4->Specular
+	int mode; // 7 -> Point 8->Directional 9->Spot light 
 	
 
+
 public:
-	lights()
+	light()
 	{
-		type = TYPE_DIFFUSE;
+		//defaults
+		type = GL_DIFFUSE;// TYPE_DIFFUSE;
+		mode = DIRECTIONAL;
 		for(int i=0;i<3;i++) color[i] = -1;
 		for (int i = 0; i<4; i++) pos[i] = 0;
 		
 	}
 
-	lights(int t, GLfloat r, GLfloat g, GLfloat b)
+	light(GLenum t, int m, GLfloat r, GLfloat g, GLfloat b)
 	{
 		type = t;
+		mode = t;
 		color[0] = r; color[1] = g; color[2] = b;
 		for (int i = 0; i<4; i++) pos[i] = 0;
+		for (int i = 0; i<4; i++) spot_direction[i] = 0;
 	}
-	
-	void setPosition(GLfloat x, GLfloat y, GLfloat z, GLfloat tipo)
+	light(GLenum t, int m, GLfloat r, GLfloat g, GLfloat b, GLfloat x, GLfloat y, GLfloat z)
 	{
-		pos[0] = x; pos[1] = y; pos[2] = z;
-		if (tipo == 0) pos[3] = 0;
-		else pos[3] = 1;
-
+		type = t;
+		mode = m;
+		color[0] = r; color[1] = g; color[2] = b;
+		for (int i = 0; i<4; i++) spot_direction[i] = 0;
+		setPosition(m, x, y, z);
+	}
+	light(GLenum t, int m, GLfloat r, GLfloat g, GLfloat b, GLfloat x, GLfloat y, GLfloat z, GLfloat sx, GLfloat sy, GLfloat sz)
+	{
+		type = t;
+		mode = m;
+		color[0] = r; color[1] = g; color[2] = b;
+		spot_direction[0] = sx; spot_direction[1] = sy; spot_direction[2] = sz;
+		setPosition(m, x, y, z);
 	}
 
-	float* getPos() { return pos; }
-	float* getColor() { return color; }
+	void setPosition (int m, GLfloat x, GLfloat y, GLfloat z)
+	{
+		pos[0] = x; pos[1] = y; pos[2] = z; mode = m;
+		(m == 8) ? pos[3] = 0 : pos[3] = 1;
+	}
 
-	int getType() { return type; }
+
+	GLfloat* getPos() { return pos; }
+	GLfloat* getSpotLightDirection() { return spot_direction; }
+	GLfloat* getColor() { return color; }
+	int getMode() { return mode; }
+	GLenum getType() { return type; }
 
 };
 
 class cena {
 	vector<modelo*> modelos;
 	vector<drawable*> itens;
+	vector<transf*> transformacoes;
 	vector<primitiveVBO*> primitivas;
+	vector<light*> luzes;
 	int n_primitivas = 0;
 
 
@@ -484,33 +522,30 @@ public:
 		n_primitivas++;
 		return n_primitivas - 1;
 	}
-
 	void addTransf(transf* t) {
 		itens.push_back(t);
+		transformacoes.push_back(t);
 	}
-
 	void addModelo(modelo* mod) {
 		itens.push_back(mod);
 		modelos.push_back(mod);
 	}
+	void addLight(light* l) { luzes.push_back(l); }
 
 	int getN_primitivas() { return n_primitivas;  }
-
-	vector<drawable*> getItens() {
-		return itens;
-	}
-
-	vector<primitiveVBO*> getPrimitivas()
+	int getNtexturas()
 	{
-		return primitivas;
+		int i = 0;
+		for (vector<modelo*>::iterator it = modelos.begin(); it != modelos.end(); it++)
+		{
+			if ((*it._Ptr)->getTextura() != "") i++;
+		}
+		return i;
 	}
 
-	vector<modelo*> getModelos() {
-		return modelos;
-	}
 
 	/*
-	retorna -1 se não encontrado ou posição da primitiva na cena caso encontrado
+	Pesquisa nos modelos a existencia de uma determinada primitiva, se sim, retorna id, caso contrario retorna -1
 	*/
 	int exists(string nome)
 	{
@@ -523,15 +558,10 @@ public:
 		return -1;
 	}
 	
-	int getNtexturas()
-	{
-		int i = 0;
-		for (vector<modelo*>::iterator it = modelos.begin(); it != modelos.end(); it++)
-		{
-			if ((*it._Ptr)->getTextura() != "") i++;
-		}
-		return i;
-	}
+	vector<drawable*> getItens() { return itens; }
+	vector<primitiveVBO*> getPrimitivas() {	return primitivas; }
+	vector<modelo*> getModelos() {	return modelos;	}
+	vector<light*> getLights() { return luzes;  }
 
 
 	
