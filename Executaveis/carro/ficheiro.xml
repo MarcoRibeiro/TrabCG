@@ -1,0 +1,145 @@
+<cena>
+	<luzes>
+		<luz tipo=POINT posX=0 posY=3 posZ=0/>
+	</luzes>
+	
+	<grupo><!-------carro------->
+		
+		<escala X=0.5 Y=0.5 Z=0.5 />
+		<grupo>
+			<rotacao angulo=90 eixoX=1/>
+			<escala X=0.7 Y=3 Z=0.2 />
+			<modelos>
+				<modelo ficheiro=cilindro.txt textura=metal.jpg/>
+			</modelos>
+		</grupo>
+		<grupo>
+			<translacao Y=-0.2/>
+			<escala X=0.3 Y=0.08 Z=0.5 />
+			<modelos>
+				<modelo ficheiro=corpo.txt diffR=1 diffG=0 diffB=0/>
+			</modelos>
+		</grupo>
+		<grupo>
+			<translacao Z=2/>
+			<rotacao angulo=90 eixoX=1/>
+			<escala X=0.7 Y=1 Z=0.2 />
+			<modelos>
+				<modelo ficheiro=cone.txt textura=metal.jpg/>
+			</modelos>
+			<grupo>
+				<translacao Y=0.5 Z=0.2/>
+				<rotacao angulo=90 eixoX=1/>
+				<rotacao angulo=60 eixoX=1/>
+				<escala X=0.4 Y=0.1 Z=0.2 />
+				<modelos>
+					<modelo ficheiro=corpo.txt diffR=1 diffG=0 diffB=0/>
+				</modelos>
+		</grupo>
+
+		</grupo>
+		<grupo>
+			<translacao X=0.8 Z=1.5 Y=-0.1/>
+			<rotacao angulo=90 eixoX=1/>
+			<rotacao angulo=90 eixoZ=1/>
+			<escala X=0.3 Y=0.2 Z=0.3 />
+			<modelos>
+				<modelo ficheiro=cilindro.txt textura=pneu.jpg/>
+			</modelos>
+				
+		</grupo>
+			
+			<grupo>
+				
+			<translacao X=-0.8 Z=1.5 Y=-0.1/>
+			<rotacao angulo=90 eixoX=1/>
+			<rotacao angulo=90 eixoZ=1/>
+			<escala X=0.3 Y=0.2 Z=0.3 />
+			<modelos>
+				<modelo ficheiro=cilindro.txt textura=pneu.jpg/>
+			</modelos>
+				
+		</grupo>
+		
+		<grupo>
+			<translacao X=-0.8 Z=-1.5 Y=-0.1/>
+			<rotacao angulo=90 eixoX=1/>
+			<rotacao angulo=90 eixoZ=1/>
+			<escala X=0.4 Y=0.3 Z=0.4 />
+			<modelos>
+				<modelo ficheiro=cilindro.txt textura=pneu.jpg/>
+			</modelos>
+				
+		</grupo>
+		<grupo>
+			<translacao X=0.8 Z=-1.5 Y=-0.1/>
+			<rotacao angulo=90 eixoX=1/>
+			<rotacao angulo=90 eixoZ=1/>
+			<escala X=0.4 Y=0.3 Z=0.4 />
+			<modelos>
+				<modelo ficheiro=cilindro.txt textura=pneu.jpg/>
+			</modelos>
+				
+		</grupo>
+		<grupo>
+			<translacao X=0.2 Z=-1.5 Y=-0.1/>
+			<rotacao angulo=90 eixoX=1/>
+			
+			<escala X=0.1 Y=0.6 Z=0.1 />
+			<modelos>
+				<modelo ficheiro=cilindro.txt diffR=0 diffG=0 diffB=0/>
+			</modelos>
+				
+		</grupo>
+		
+		<grupo>
+			<translacao X=-0.2 Z=-1.5 Y=-0.1/>
+			
+			<rotacao angulo=90 eixoX=1/>
+			
+			<escala X=0.1 Y=0.6 Z=0.1 />
+			<modelos>
+				<modelo ficheiro=cilindro.txt textura=metal.jpg/>
+			</modelos>
+				
+		</grupo>
+		<grupo>
+			<translacao X=-0.2 Z=-1.3 Y=0.1/>
+			
+			<rotacao angulo=90 eixoY=1/>
+			<escala X=0.1 Y=0.5 Z=0.1 />
+			<modelos>
+				<modelo ficheiro=cilindro.txt textura=metal.jpg/>
+			</modelos>
+				
+		</grupo>
+		<grupo>
+			<translacao X=0.2 Z=-1.3 Y=0.1/>
+			
+			<rotacao angulo=90 eixoY=1/>
+			<escala X=0.1 Y=0.5 Z=0.1 />
+			<modelos>
+				<modelo ficheiro=cilindro.txt textura=metal.jpg/>
+			</modelos>
+				
+		</grupo>
+		<grupo>
+				<translacao Z=-1.5 Y=0.4/>
+				<rotacao angulo=90 eixoX=1/>
+				<rotacao angulo=15 eixoX=1/>
+				<escala X=0.3 Y=0.2 Z=0.03 />
+				<modelos>
+					<modelo ficheiro=corpo.txt diffR=1 diffG=0 diffB=0/>
+				</modelos>
+		</grupo>
+		<grupo>
+				<translacao Y=0.4/>
+				<rotacao angulo=90 eixoX=1/>
+				<escala X=0.3 Y=0.4 Z=0.3 />
+				<modelos>
+					<modelo ficheiro=esfera.txt textura=heli.jpg/>
+				</modelos>
+		</grupo>
+	</grupo><!-------carro------->
+
+</cena>		

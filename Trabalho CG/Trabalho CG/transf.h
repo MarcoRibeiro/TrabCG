@@ -107,7 +107,6 @@ public:
 		int elapsed_time;
 		float racio, delta;
 
-		// CONVERS„O DE vector<float> em float *** MELHORAR!!!!!!!!!!!!!!!!!!!!!!!!!
 		float** pontos;
 		int npontos = curva.size() / 3;
 

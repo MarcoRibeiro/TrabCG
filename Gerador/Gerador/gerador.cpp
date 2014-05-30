@@ -1,66 +1,224 @@
 #include <math.h>
 #include <fstream>
 #include <iostream>
-#include "C:\Users\Nelson\Documents\GitHub\TrabCG\Trabalho CG\Trabalho CG\classes.h"
+#include "classes.h"
 #include "patchBezier.h"
 
 #define PI 3.14159
 
 
-primitiveVBO drawPlane(float largura, float comprimento)
+primitiveVBO drawPlane(float comprimento, float largura, int camadas)
 {
 	primitiveVBO p;
-	float l = largura / 2;
-	float c = comprimento / 2;
+	float z0 = largura / 2;
+	float x0 = -comprimento / 2;
+	float y = 0.0f;
+	float incH = comprimento / camadas;
+	float incV = largura / camadas;
 
-	vertex p1(-c, 0, l, 0, 1, 0);
-	vertex p2(c, 0, l, 0, 1, 0);
-	vertex p3(c, 0, -l, 0, 1, 0);
-	vertex p4(-c, 0, -l, 0, 1, 0);
+	float incremento = 1.0 / camadas;
 
-	p.addPonto(p1); p.addPonto(p2); p.addPonto(p3); p.addPonto(p4);
+	int nindices = 4;   //numero de indices adicionados por ciclo
+	int inc = 0;
+	int h = 0;
 
-	p.addTriangulo(0, 1, 2);
-	p.addTriangulo(2, 3, 0);
+	for (int i = 0; i < camadas; i++) {
+		for (int j = 0; j < camadas; j++) {
+
+			inc = nindices*h;
+
+			vertex p0(x0+(i*incH), y, z0 - (j*incV)); p0.setNormal(0.0f, 1.0f, 0.0f);
+			p0.setText2D(i*incremento, j*incremento);
+			vertex p1(x0+((i+1)*incH), y, z0-(j*incV)); p1.setNormal(0.0f, 1.0f, 0.0f);
+			p1.setText2D((i + 1)*incremento, j*incremento);
+			vertex p2(x0+((i+1)*incH), y, z0-((j+1)*incV)); p2.setNormal(0.0f, 1.0f, 0.0f);
+			p2.setText2D((i + 1)*incremento, (j + 1)*incremento);
+			vertex p3(x0+(i*incH), y, z0 - ((j+1)*incV)); p3.setNormal(0.0f, 1.0f, 0.0f);
+			p3.setText2D(i*incremento, (j + 1)*incremento);
+
+			p.addPonto(p0); p.addPonto(p1); p.addPonto(p2); p.addPonto(p3);
+
+			//visto de cima
+			p.addTriangulo(inc + 0,inc + 1,inc + 2);
+			p.addTriangulo(inc + 0,inc + 2,inc + 3);
+
+			//visto de cima
+			p.addTriangulo(inc + 0, inc + 2, inc + 1);
+			p.addTriangulo(inc + 0, inc + 3, inc + 2);
+
+			h++;
+		}
+	}
+	return p;
+}
+
+primitiveVBO drawRectangule( float comprimento, float largura, float altura, int camadas)  //Paralelipipedo
+{
+	primitiveVBO p;
+
+	float z0 = largura / 2.0f;
+	float x0 = -comprimento / 2.0f;
+	float y0 = -altura / 2.0f;
+	float incC = comprimento / camadas;
+	float incL = largura / camadas;
+	float incA = altura / camadas;
+
+
+	float incremento = 1.0 / camadas; // textura
+
+	int nindices = 4;   //numero de indices adicionados por ciclo
+	int inc = 0;
+	int h = 0;
+
+	//face frontal
+	for (int i = 0; i < camadas; i++) {
+		for (int j = 0; j < camadas; j++) {
+
+			inc = nindices*h;
+
+			vertex p0(x0 + (i*incC), y0 + (j*incA), z0) ; p0.setNormal(0.0f, 0.0f, 1.0f);
+			//p0.setText2D(i*incremento, j*incremento);
+			vertex p1(x0 + ((i + 1)*incC), y0 + (j*incA), z0); p1.setNormal(0.0f, 0.0f, 1.0f);
+			//p1.setText2D((i + 1)*incremento, j*incremento);
+			vertex p2(x0 + ((i + 1)*incC), y0 + ((j + 1)*incA),z0); p2.setNormal(0.0f, 0.0f, 1.0f);
+			//p2.setText2D((i + 1)*incremento, (j + 1)*incremento);
+			vertex p3(x0 + (i*incC), y0 + ((j + 1)*incA),z0); p3.setNormal(0.0f, 0.0f, 1.0f);
+			//p3.setText2D(i*incremento, (j + 1)*incremento);
+
+			p.addPonto(p0); p.addPonto(p1); p.addPonto(p2); p.addPonto(p3);
+
+			p.addTriangulo(inc + 0, inc + 1, inc + 2);
+			p.addTriangulo(inc + 0, inc + 2, inc + 3);
+
+			h++;
+		}
+	}
+
+	//face traseira
+	for (int i = 0; i < camadas; i++) {
+		for (int j = 0; j < camadas; j++) {
+
+			inc = nindices*h;
+
+			vertex p0(x0 + (i*incC), y0 + (j*incA), -z0); p0.setNormal(0.0f, 0.0f, -1.0f);
+			//p0.setText2D(i*incremento, j*incremento);
+			vertex p1(x0 + ((i + 1)*incC), y0 + (j*incA), -z0); p1.setNormal(0.0f, 0.0f, -1.0f);
+			//p1.setText2D((i + 1)*incremento, j*incremento);
+			vertex p2(x0 + ((i + 1)*incC), y0 + ((j + 1)*incA), -z0); p2.setNormal(0.0f, 0.0f, -1.0f);
+			//p2.setText2D((i + 1)*incremento, (j + 1)*incremento);
+			vertex p3(x0 + (i*incC), y0 + ((j + 1)*incA), -z0); p3.setNormal(0.0f, 0.0f, -1.0f);
+			//p3.setText2D(i*incremento, (j + 1)*incremento);
+
+			p.addPonto(p0); p.addPonto(p1); p.addPonto(p2); p.addPonto(p3);
+
+			p.addTriangulo(inc + 0, inc + 2, inc + 1);
+			p.addTriangulo(inc + 0, inc + 3, inc + 2);
+
+			h++;
+		}
+	}
+
+	//face lateral esquerda
+	for (int i = 0; i < camadas; i++) {
+		for (int j = 0; j < camadas; j++) {
+
+			inc = nindices*h;
+
+			vertex p0(x0, y0 + (j*incA), z0 - (i*incL)); p0.setNormal(-1.0f, 0.0f, 0.0f);
+			//p0.setText2D(i*incremento, j*incremento);
+			vertex p1(x0, y0 + (j*incA), z0 - ((i + 1)*incL)); p1.setNormal(-1.0f, 0.0f, 0.0f);
+			//p1.setText2D((i + 1)*incremento, j*incremento);
+			vertex p2(x0, y0 + ((j + 1)*incA), z0 - ((i + 1)*incL)); p2.setNormal(-1.0f, 0.0f, 0.0f);
+			//p2.setText2D((i + 1)*incremento, (j + 1)*incremento);
+			vertex p3(x0, y0 + ((j + 1)*incA), z0 - (i*incL)); p3.setNormal(-1.0f, 0.0f, 0.0f);
+			//p3.setText2D(i*incremento, (j + 1)*incremento);
+
+			p.addPonto(p0); p.addPonto(p1); p.addPonto(p2); p.addPonto(p3);
+
+			p.addTriangulo(inc + 0, inc + 2, inc + 1);
+			p.addTriangulo(inc + 0, inc + 3, inc + 2);
+
+			h++;
+		}
+	}
+
+	//face lateral direita
+	for (int i = 0; i < camadas; i++) {
+		for (int j = 0; j < camadas; j++) {
+
+			inc = nindices*h;
+
+			vertex p0(-x0, y0 + (j*incA), z0 - (i*incL)); p0.setNormal(1.0f, 0.0f, 0.0f);
+			//p0.setText2D(i*incremento, j*incremento);
+			vertex p1(-x0, y0 + (j*incA), z0 - ((i + 1)*incL)); p1.setNormal(1.0f, 0.0f, 0.0f);
+			//p1.setText2D((i + 1)*incremento, j*incremento);
+			vertex p2(-x0, y0 + ((j + 1)*incA), z0 - ((i + 1)*incL)); p2.setNormal(1.0f, 0.0f, 0.0f);
+			//p2.setText2D((i + 1)*incremento, (j + 1)*incremento);
+			vertex p3(-x0, y0 + ((j + 1)*incA), z0 - (i*incL)); p3.setNormal(1.0f, 0.0f, 0.0f);
+			//p3.setText2D(i*incremento, (j + 1)*incremento);
+
+			p.addPonto(p0); p.addPonto(p1); p.addPonto(p2); p.addPonto(p3);
+
+			p.addTriangulo(inc + 0, inc + 1, inc + 2);
+			p.addTriangulo(inc + 0, inc + 2, inc + 3);
+
+			h++;
+		}
+	}
+
+	//Topo
+	for (int i = 0; i < camadas; i++) {
+		for (int j = 0; j < camadas; j++) {
+
+			inc = nindices*h;
+
+			vertex p0(x0 + (i*incC), -y0, z0 - (j*incL)); p0.setNormal(0.0f, 1.0f, 0.0f);
+			//	p0.setText2D(i*incremento, j*incremento);
+			vertex p1(x0 + ((i + 1)*incC), -y0, z0 - (j*incL)); p1.setNormal(0.0f, 1.0f, 0.0f);
+			//	p1.setText2D((i + 1)*incremento, j*incremento);
+			vertex p2(x0 + ((i + 1)*incC), -y0, z0 - ((j + 1)*incL)); p2.setNormal(0.0f, 1.0f, 0.0f);
+			//	p2.setText2D((i + 1)*incremento, (j + 1)*incremento);
+			vertex p3(x0 + (i*incC), -y0, z0 - ((j + 1)*incL)); p3.setNormal(0.0f, 1.0f, 0.0f);
+			//	p3.setText2D(i*incremento, (j + 1)*incremento);
+
+			p.addPonto(p0); p.addPonto(p1); p.addPonto(p2); p.addPonto(p3);
+
+			p.addTriangulo(inc + 0, inc + 1, inc + 2);
+			p.addTriangulo(inc + 0, inc + 2, inc + 3);
+
+			h++;
+		}
+	}
+
+	//Baixo
+	for (int i = 0; i < camadas; i++) {
+		for (int j = 0; j < camadas; j++) {
+
+			inc = nindices*h;
+
+			vertex p0(x0 + (i*incC), y0, z0 - (j*incL)); p0.setNormal(0.0f, 1.0f, 0.0f);
+			//	p0.setText2D(i*incremento, j*incremento);
+			vertex p1(x0 + ((i + 1)*incC), y0, z0 - (j*incL)); p1.setNormal(0.0f, 1.0f, 0.0f);
+			//	p1.setText2D((i + 1)*incremento, j*incremento);
+			vertex p2(x0 + ((i + 1)*incC), y0, z0 - ((j + 1)*incL)); p2.setNormal(0.0f, 1.0f, 0.0f);
+			//	p2.setText2D((i + 1)*incremento, (j + 1)*incremento);
+			vertex p3(x0 + (i*incC), y0, z0 - ((j + 1)*incL)); p3.setNormal(0.0f, 1.0f, 0.0f);
+			//	p3.setText2D(i*incremento, (j + 1)*incremento);
+
+			p.addPonto(p0); p.addPonto(p1); p.addPonto(p2); p.addPonto(p3);
+
+			p.addTriangulo(inc + 0, inc + 2, inc + 1);
+			p.addTriangulo(inc + 0, inc + 3, inc + 2);
+
+			h++;
+		}
+	}
 
 	return p;
 }
 
-primitiveVBO drawRectangule( float comprimento, float largura, float altura)  //Paralelipipedo
-{
-	primitiveVBO p;
-	float l = largura / 2, c = comprimento / 2, a = altura / 2;
-
-	vertex p1(-c, a, l);
-	vertex p2(-c, -a, l);
-	vertex p3(c, -a, l);
-	vertex p4(c, a, l);
-	vertex p5(c, a, -l);
-	vertex p6(c, -a, -l);
-	vertex p7(-c, -a, -l);
-	vertex p8(-c, a, -l);
-
-
-	p.addPonto(p1); p.addPonto(p2); p.addPonto(p3); p.addPonto(p4);
-	p.addPonto(p5); p.addPonto(p6); p.addPonto(p7); p.addPonto(p8);
-
-	p.addTriangulo(0, 1, 3);
-	p.addTriangulo(1, 2, 3);
-	p.addTriangulo(3, 2, 4);
-	p.addTriangulo(2, 5, 4);
-	p.addTriangulo(0, 3, 4);
-	p.addTriangulo(0, 4, 7);
-	p.addTriangulo(7, 6, 1);
-	p.addTriangulo(1, 0, 7);
-	p.addTriangulo(7, 4, 5);
-	p.addTriangulo(5, 6, 7);
-	p.addTriangulo(1, 6, 5);
-	p.addTriangulo(5, 2, 1);
-
-	return p;
-}
-primitiveVBO drawCube(float size) {
-	return drawRectangule(size, size, size);
+primitiveVBO drawCube(float size, int camadas) {
+	return drawRectangule(size, size, size, camadas);
 }
 primitiveVBO drawCilinder(float n_lados, float altura, float raio)
 {
@@ -347,23 +505,13 @@ primitiveVBO drawBezierSurface(string file, int tesselacao) {
 static void show_usage()
 {
 	std::cerr << endl << "\nUsage: primitiva <options> <filename.txt>\n" << endl << "cilindro <lados altura raio>" << endl <<
-		"cone <lados altura raio>" << endl << "cubo <aresta>" << endl << "paralelipipedo <comprimento largura altura>" << endl <<
-		"plano <comprimento largura>" << endl << "esfera <raio fatias camadas>" << endl << "disco <raio_interior raio_exterior tesselacao>" << endl << "supBezier <ficheiro .patch tesselacao>" << endl;
+		"cone <lados altura raio>" << endl << "cubo <aresta camadas>" << endl << "paralelipipedo <comprimento largura altura camadas>" << endl <<
+		"plano <comprimento largura camadas>" << endl << "esfera <raio fatias camadas>" << endl << "disco <raio_interior raio_exterior tesselacao>" << endl << "supBezier <ficheiro .patch tesselacao>" << endl;
 }
 
 
 int main(int argc, char **argv) {
 	primitiveVBO p;
-
-	//p = drawCilinder(16.0, 2.0, 1.0);
-	//p = drawCone(16, 2, 1);
-	//p = drawSphere (1, 16, 16);
-	//p = drawBezierSurface("teapot.patch", 5);
-	//p.saveFile("teste.txt");
-
-//	primitiveVBO a;
-//	a.loadFile("teste.txt");
-
 
 	
 	if (argc == 1) show_usage();
@@ -412,15 +560,16 @@ int main(int argc, char **argv) {
 				}
 			}
 			else if (arg == "cubo") {
-				string err = "\n-- Erro -- Argumentos invalidos\nUsage: cubo <aresta> <filename>\n";
-				if (argc != 4){
+				string err = "\n-- Erro -- Argumentos invalidos\nUsage: cubo <aresta camadas> <filename>\n";
+				if (argc != 5){
 					std::cerr << err;
 				}
 				else{
 					try{
 						float aresta = stof(argv[i + 1]);
-						string file = argv[i + 2];
-						p = drawCube(aresta);
+						int camadas = atoi(argv[i + 2]);
+						string file = argv[i + 3];
+						p = drawCube(aresta, camadas);
 						p.saveFile(file);
 					}
 					catch (invalid_argument)
@@ -430,8 +579,8 @@ int main(int argc, char **argv) {
 				}
 			}
 			else if (arg == "paralelipipedo") {
-				string err = "\n-- Erro -- Argumentos invalidos\nUsage: paralelipipedo <comprimento largura altura> <filename>\n";
-				if (argc != 6){
+				string err = "\n-- Erro -- Argumentos invalidos\nUsage: paralelipipedo <comprimento largura altura camadas> <filename>\n";
+				if (argc != 7){
 					std::cerr << err;
 				}
 				else{
@@ -439,8 +588,9 @@ int main(int argc, char **argv) {
 						float largura = stof(argv[i + 1]);
 						float comprimento = stof(argv[i + 2]);
 						float altura = stof(argv[i + 3]);
-						string file = argv[i + 4];
-						p = drawRectangule(largura, comprimento, altura);
+						int camadas = atoi(argv[i + 4]);
+						string file = argv[i + 5];
+						p = drawRectangule(largura, comprimento, altura, camadas);
 						p.saveFile(file);
 					}
 					catch (invalid_argument)
@@ -450,16 +600,17 @@ int main(int argc, char **argv) {
 				}
 			}
 			else if (arg == "plano") {
-				string err = "\n-- Erro -- Argumentos invalidos\nUsage: plano <comprimento largura> <filename>\n";
-				if (argc != 5){
+				string err = "\n-- Erro -- Argumentos invalidos\nUsage: plano <comprimento largura camadas> <filename>\n";
+				if (argc != 6){
 					std::cerr << err;
 				}
 				else{
 					try{
 						float largura = stof(argv[i + 1]);
 						float comprimento = stof(argv[i + 2]);
-						string file = argv[i + 3];
-						p = drawPlane(largura, comprimento);
+						int camadas= atoi(argv[i + 3]);
+						string file = argv[i + 4];
+						p = drawPlane(comprimento, largura, camadas);
 						p.saveFile(file);
 					}
 					catch (invalid_argument)
@@ -530,4 +681,5 @@ int main(int argc, char **argv) {
 			}
 		}
 	}
+	
 }	

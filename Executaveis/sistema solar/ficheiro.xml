@@ -1,0 +1,271 @@
+<cena>
+<luzes>
+	<luz tipo=POINT posX=0 posY=0 posZ=0/>
+</luzes>
+<grupo>
+	<translacao Y=0.2 />
+	<escala X=0.8 Y=0.8 Z=0.8 />
+	<grupo>
+		<rotacaoT tempo=50 eixoX=0 eixoY=1 eixoZ=0/>
+		<escala X=0.20 Y=0.20 Z=0.20 />
+		<modelos>
+			<modelo ficheiro=esfera.txt emiR=0.8 emiG=0.8 emiB=0.15 textura=sun__.jpg nome=sol/>
+		</modelos>
+		<rotacaoT tempo=50 eixoX=1 eixoY=-1 eixoZ=0/>
+	</grupo>
+	<grupo>
+		
+		<rotacao angulo=90 eixoX=1 eixoY=0 eixoZ=0 />
+
+		<translacaoT tempo=9>
+			<ponto X=0.5 Y=0 Z=0 />
+			<ponto X=0.3535 Y=0.3535 Z=0 />
+			<ponto X=0 Y=0.5 Z=0 />
+			<ponto X=-0.3535 Y=0.3535 Z=0 />
+			<ponto X=-0.5 Y=0 Z=0 />
+			<ponto X=-0.3535 Y=-0.3535 Z=0 />
+			<ponto X=0 Y=-0.5 Z=0 />
+			<ponto X=0.3535 Y=-0.3535 Z=0 />
+		</translacaoT>
+		<escala X=0.03 Y=0.03 Z=0.03 />
+		<rotacao angulo=-135 eixoX=1 eixoY=0 eixoZ=0 />
+		<rotacaoT tempo=5 eixoX=0 eixoY=1 eixoZ=0 />
+		<modelos>
+			<modelo ficheiro=esfera.txt textura=mercury__.jpg nome=mercurio/>
+		</modelos>
+		<rotacaoT tempo=5 eixoX=0 eixoY=-1 eixoZ=0 />
+	</grupo>
+	<grupo>
+		
+		
+		<rotacao angulo=90 eixoX=1 eixoY=0 eixoZ=0 />
+
+		<translacaoT tempo=14>
+			<ponto X=0.7 Y=0 Z=0 />
+			<ponto X=0.4949 Y=0.4949 Z=0 />
+			<ponto X=0 Y=0.7 Z=0 />
+			<ponto X=-0.4949 Y=0.4949 Z=0 />
+			<ponto X=-0.7 Y=0 Z=0 />
+			<ponto X=-0.4949 Y=-0.4949 Z=0 />
+			<ponto X=0 Y=-0.7 Z=0 />
+			<ponto X=0.4949 Y=-0.4949 Z=0 />
+		</translacaoT>
+		<escala X=0.06 Y=0.06 Z=0.06 />
+		<rotacao angulo=-135 eixoX=1 eixoY=0 eixoZ=0 />
+		<rotacaoT tempo=10 eixoX=0 eixoY=-1 eixoZ=0 />
+		<modelos>
+			<modelo ficheiro=esfera.txt textura=venus__.jpg nome=venus/>
+		</modelos>
+		<rotacaoT tempo=10 eixoX=0 eixoY=1 eixoZ=0 />
+	</grupo>
+	<grupo>
+	
+		
+		<rotacao angulo=90 eixoX=1 eixoY=0 eixoZ=0 />
+		<translacaoT tempo=20>
+			<ponto X=1 Y=0 Z=0 />
+			<ponto X=0.707 Y=0.707 Z=0 />
+			<ponto X=0 Y=1 Z=0 />
+			<ponto X=-0.707 Y=0.707 Z=0 />
+			<ponto X=-1 Y=0 Z=0 />
+			<ponto X=-0.707 Y=-0.707 Z=0 />
+			<ponto X=0 Y=-1 Z=0 />
+			<ponto X=0.707 Y=-0.707 Z=0 />
+		</translacaoT>
+		<escala X=0.080 Y=0.080 Z=0.080 />
+		<rotacao angulo=-135 eixoX=1 eixoY=0 eixoZ=0 />
+		<rotacaoT tempo=3 eixoX=0 eixoY=1 eixoZ=0 />
+		<modelos>
+			<modelo ficheiro=esfera.txt textura=earth__.jpg nome=terra/>
+		</modelos>
+		<rotacaoT tempo=3 eixoX=0 eixoY=-1 eixoZ=0 />
+		<grupo>
+			
+			<rotacao angulo=60 eixoX=1 eixoY=0 eixoZ=0 />
+			<escala X=1.6 Y=1.6 Z=1.6 />
+			<translacaoT tempo=15>
+			<ponto X=0.707 Y=-0.707 Z=0 />
+			<ponto X=0 Y=-1 Z=0 />
+			<ponto X=-0.707 Y=-0.707 Z=0 />
+			<ponto X=-1 Y=0 Z=0 />
+			<ponto X=-0.707 Y=0.707 Z=0 />
+			<ponto X=0 Y=1 Z=0 />
+			<ponto X=0.707 Y=0.707 Z=0 />
+			<ponto X=1 Y=0 Z=0 />
+		</translacaoT>
+			<escala X=0.1 Y=0.1 Z=0.1 />
+			<modelos>
+
+				<modelo ficheiro=esfera.txt textura=moon__.jpg nome=lua/>
+			</modelos>
+		</grupo>
+	</grupo>
+	<grupo>
+		
+
+		<rotacao angulo=90 eixoX=1 eixoY=0 eixoZ=0 />
+
+		<translacaoT tempo=40>
+			<ponto X=1.2 Y=0 Z=0 />
+			<ponto X=0.8484 Y=0.8484 Z=0 />
+			<ponto X=0 Y=1.2 Z=0 />
+			<ponto X=-0.8484 Y=0.8484 Z=0 />
+			<ponto X=-1.2 Y=0 Z=0 />
+			<ponto X=-0.8484 Y=-0.8484 Z=0 />
+			<ponto X=0 Y=-1.2 Z=0 />
+			<ponto X=0.8484 Y=-0.8484 Z=0 />
+		</translacaoT>
+		<escala X=0.040 Y=0.040 Z=0.040 />
+		<rotacao angulo=-135 eixoX=1 eixoY=0 eixoZ=0 />
+		<rotacaoT tempo=3 eixoX=0 eixoY=1 eixoZ=0 />
+		<modelos>
+			<modelo ficheiro=esfera.txt textura=mars__.jpg nome=marte/>
+		</modelos>
+		<rotacaoT tempo=3 eixoX=0 eixoY=-1 eixoZ=0 />
+	</grupo>
+	<grupo>
+		<rotacao angulo=180 eixoX=1 eixoY=0 eixoZ=0 />
+		<rotacaoT tempo=400 eixoX=0 eixoY=1 eixoZ=0 />
+		<modelos>
+			<modelo ficheiro=discoG.txt textura=asteroids6.jpg emiR=1 emiG=1 emiB=1 nome=cintura_asteroids  />
+		</modelos>
+	</grupo>
+	<grupo>
+		<rotacao angulo=90 eixoX=1 eixoY=0 eixoZ=0 />
+
+		<translacaoT tempo=50>
+			<ponto X=1.6 Y=0 Z=0 />
+			<ponto X=1.1312 Y=1.1312 Z=0 />
+			<ponto X=0 Y=1.6 Z=0 />
+			<ponto X=-1.1312 Y=1.1312 Z=0 />
+			<ponto X=-1.6 Y=0 Z=0 />
+			<ponto X=-1.1312 Y=-1.1312 Z=0 />
+			<ponto X=0 Y=-1.6 Z=0 />
+			<ponto X=1.1312 Y=-1.1312 Z=0 />
+		</translacaoT>
+		<escala X=0.12 Y=0.12 Z=0.12 />
+		<rotacao angulo=-135 eixoX=1 eixoY=0 eixoZ=0 />
+		<rotacaoT tempo=1.5 eixoX=0 eixoY=1 eixoZ=0 />
+		<modelos>
+			<modelo ficheiro=esfera.txt textura=jupiter__.jpg nome=jupiter/>
+		</modelos>
+		<rotacaoT tempo=1.5 eixoX=0 eixoY=-1 eixoZ=0 />
+		<grupo>
+			<rotacao angulo=-120 eixoX=1 eixoY=1 eixoZ=0 />
+			<translacao X=1.5 />
+			<escala X=0.08 Y=0.08 Z=0.08 />
+			<modelos>
+				<modelo ficheiro=esfera.txt nome=io/>
+			</modelos>
+		</grupo>
+		<grupo>
+			<rotacao angulo=90 eixoX=0 eixoY=1 eixoZ=1 />
+			<translacao X=1.8 />
+			<escala X=0.08 Y=0.08 Z=0.08 />
+			<modelos>
+				<modelo ficheiro=esfera.txt nome=europa/>
+			</modelos>
+		</grupo>
+		<grupo>
+			<rotacao angulo=-90 eixoX=0 eixoY=1 eixoZ=0 />
+			<translacao X=2.1 />
+			<escala X=0.18 Y=0.18 Z=0.18 />
+			<modelos>
+				<modelo ficheiro=esfera.txt nome=ganymede/>
+			</modelos>
+		</grupo>
+		<grupo>
+			<rotacao angulo=10 eixoX=0 eixoY=1 eixoZ=0 />
+			<translacao X=2.4 />
+			<escala X=0.13 Y=0.13 Z=0.13 />
+			<modelos>
+				<modelo ficheiro=esfera.txt nome=calisto/>
+			</modelos>
+		</grupo>
+	</grupo>
+	<grupo>
+		
+
+		<rotacao angulo=90 eixoX=1 eixoY=0 eixoZ=0 />
+
+		<translacaoT tempo=80>
+			<ponto X=2 Y=0 Z=0 />
+			<ponto X=1.414 Y=1.414 Z=0 />
+			<ponto X=0 Y=2 Z=0 />
+			<ponto X=-1.414 Y=1.414 Z=0 />
+			<ponto X=-2 Y=0 Z=0 />
+			<ponto X=-1.414 Y=-1.414 Z=0 />
+			<ponto X=0 Y=-2 Z=0 />
+			<ponto X=1.414 Y=-1.414 Z=0 />
+		</translacaoT>
+		<escala X=0.1 Y=0.1 Z=0.1 />
+		<rotacao angulo=-135 eixoX=1 eixoY=0 eixoZ=0 />
+		<rotacaoT tempo=3.5 eixoX=0 eixoY=1 eixoZ=0 />
+		<modelos>
+			<modelo ficheiro=esfera.txt textura=saturn__.jpg nome=saturno/>
+			<modelo ficheiro=disco.txt textura=jupiter__.jpg nome=aneis_saturno/>
+		</modelos>
+		<rotacaoT tempo=1.5 eixoX=0 eixoY=-1 eixoZ=0 />
+	</grupo>
+	<grupo>
+		<rotacao angulo=90 eixoX=1 eixoY=0 eixoZ=0 />
+
+		<translacaoT tempo=100>
+			<ponto X=2.4 Y=0 Z=0 />
+			<ponto X=1.6969 Y=1.6969 Z=0 />
+			<ponto X=0 Y=2.4 Z=0 />
+			<ponto X=-1.6969 Y=1.6969 Z=0 />
+			<ponto X=-2.4 Y=0 Z=0 />
+			<ponto X=-1.6969 Y=-1.6969 Z=0 />
+			<ponto X=0 Y=-2.4 Z=0 />
+			<ponto X=1.6969 Y=-1.6969 Z=0 />
+		</translacaoT>
+		<escala X=0.07 Y=0.07 Z=0.07 />
+		
+		<rotacao angulo=-135 eixoX=1 eixoY=0 eixoZ=0 />
+		<rotacaoT tempo=1.8 eixoX=0 eixoY=-1 eixoZ=0 />
+		<modelos>
+			<modelo ficheiro=esfera.txt textura=uranus__.jpg nome=urano/>
+		</modelos>
+		<rotacaoT tempo=1.8 eixoX=0 eixoY=1 eixoZ=0 />
+	</grupo>
+	<grupo>
+		<rotacao angulo=90 eixoX=1 eixoY=0 eixoZ=0 />
+		<translacaoT tempo=120>
+			<ponto X=2.6 Y=0 Z=0 />
+			<ponto X=1.8382 Y=1.8382 Z=0 />
+			<ponto X=0 Y=2.6 Z=0 />
+			<ponto X=-1.8382 Y=1.8382 Z=0 />
+			<ponto X=-2.6 Y=0 Z=0 />
+			<ponto X=-1.8382 Y=-1.8382 Z=0 />
+			<ponto X=0 Y=-2.6 Z=0 />
+			<ponto X=1.8382 Y=-1.8382 Z=0 />
+		</translacaoT>
+		<escala X=0.07 Y=0.07 Z=0.07 />
+		<rotacao angulo=-135 eixoX=1 eixoY=0 eixoZ=0 />
+		<rotacaoT tempo=2 eixoX=0 eixoY=1 eixoZ=0 />
+		<modelos>
+			<modelo ficheiro=esfera.txt textura=neptune__.jpg nome=neptuno/>
+		</modelos>
+		<rotacaoT tempo=2 eixoX=0 eixoY=-1 eixoZ=0 />
+	</grupo>
+	<grupo>
+		<rotacao angulo=60 eixoX=1 eixoY=0 eixoZ=0 />
+		<translacaoT tempo=10>
+			<ponto X=4.6 Y=0 Z=0 />
+			<ponto X=2.5453 Y=2.5453 Z=0 />
+			<ponto X=0 Y=3.6 Z=0 />
+			<ponto X=-2.5453 Y=2.5453 Z=0 />
+			<ponto X=-4.6 Y=0 Z=0 />
+			<ponto X=-2.5453 Y=-2.5453 Z=0 />
+			<ponto X=0 Y=-3.6 Z=0 />
+			<ponto X=2.5453 Y=-2.5453 Z=0 />
+		</translacaoT>
+		<rotacao angulo=180 eixoX=1 eixoY=0 eixoZ=0 />
+		<escala X=0.07 Y=0.07 Z=0.07 />
+		<modelos>
+			<modelo ficheiro=teapot.txt diffR=0.6 diffG=0.6 diffB=0.15 speR=1 speG=1 speB=1 shininess=80 nome=cometa/>
+		</modelos>
+	</grupo>
+</grupo>
+</cena>		

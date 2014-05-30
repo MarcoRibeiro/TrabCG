@@ -40,25 +40,26 @@ int w = 70, h = 70; // usado para setOrthographicProjection
 
 //MOVIMENTO DA CAMARA
 
-float alfa = -M_PI;  
+float alfa = M_PI;  
 float delta = 0;
 float raio = -1;
-float* vr;
-float incCamara = (2 * M_PI) / 50; //incremento de movimento da camara
+float incCamara = (2 * M_PI) / 150; //incremento de movimento da camara
 
-float cam[] = { 0.0f, 0.0f, 5.0f };
-float center[] = { 0.0f, 0.0f, 0.0f };
-float up[] = { 0.0f, 1.0f, 0.0f };
+//
+float *d; //distancia entre center e cam
+float* vr; //prod externo entre d e up
 
-//MOVIMENTO CAMARA
-//float centerX = 0.0f, centerY = 0.0f, centerZ = 0.0f;
-//float upX = 0.0f, upY = 1.0f, upZ = 0.0f;
+
+float cam[3]; //= { 0.0f, 0.0, 5.0f };
+float center[3];   // = { 0.0f, 0.0f, 0.0f };
+float up[3];     // = { 0.0f, 1.0f, 0.0f };
+
+
 
 //MOVIMENTO DO RATO
-//float camX = 0, camY=0, camZ = 4;
-
+bool mode = true; //mouse on_off
 int startX, startY, tracking = 0;
-int alpha = 0, beta = 0, r = 5;
+int alpha = 0, beta = 0, r = 4;
 
 
 // TAMANHO DA JANELA
@@ -643,6 +644,7 @@ void renderScene(void) {
 
 	// set the camera
 	glLoadIdentity();
+
 	gluLookAt(cam[0], cam[1], cam[2],
 		center[0], center[1], center[2],
 		up[0], up[1], up[2]);
@@ -652,7 +654,7 @@ void renderScene(void) {
 	vector<light*>luzes = c.getLights();
 	if (luzes.size() != 0) drawLights(luzes);
 
-
+	
 	//Desenha cena
 	drawCenaVBO(c);
 
@@ -672,135 +674,170 @@ void renderScene(void) {
 		timebase = time;
 		frame = 0;
 		std::string buff = std::to_string(fps);
-		glutSetWindowTitle(buff.c_str());
+		std::string title = "CG@Motor 3D  | " + buff + " fps";
+		glutSetWindowTitle(title.c_str());
 	}
 
 	// End of frame
 	glutSwapBuffers();
 }
 
+void reset_view()
+{
+	cam[0] = 0.0f;
+	cam[1] = 1.0f;
+	cam[2] = 4.0f;
+	center[0] = 0.0f;
+	center[1] = 0.0f;
+	center[2] = 0.0f;
+	up[0] = 0.0f;
+	up[1] = 1.0f;
+	up[2] = 0.0f;
+}
+
+void updateVectors()
+{
+	d = subVectores(center, cam);
+	if(raio==-1) raio = length(d);
+	vr = prodExterno(d, up);
+	normaliza(d);
+	normaliza(vr);
+
+	
+
+}
+
 // escrever função de processamento do teclado
+
+
 
 void sK(int codigo, int x, int y){
 
-	float *d = subVectores(center, cam);
-	normaliza(d);
-	vr = prodExterno(d, up);
-	normaliza(vr);
+	if (mode == false) {
+		updateVectors();
 
-	switch (codigo)
-	{
-		
-	case GLUT_KEY_RIGHT:
-		for(int i=0; i<3; i++) cam[i] += 0.1*vr[i];
-		for (int i = 0; i<3; i++) center[i] += 0.1*vr[i];
-		break;
-	case GLUT_KEY_LEFT:
-		for (int i = 0; i<3; i++) cam[i] -= 0.1*vr[i];
-		for (int i = 0; i<3; i++) center[i] -= 0.1*vr[i];
-		break;
-	case GLUT_KEY_UP:
-		for (int i = 0; i<3; i++) cam[i] += 0.1*d[i];
-		for (int i = 0; i<3; i++) center[i] += 0.1*d[i];
-		break;
-	case GLUT_KEY_DOWN:
-		for (int i = 0; i<3; i++) cam[i] -= 0.1*d[i];
-		for (int i = 0; i<3; i++) center[i] -= 0.1*d[i];
-		break;
-	case GLUT_KEY_PAGE_UP:
-		for (int i = 0; i<3; i++) cam[i] += 0.1*up[i];
-		for (int i = 0; i<3; i++) center[i] += 0.1*up[i];
-		break;
-	case GLUT_KEY_PAGE_DOWN:
-		for (int i = 0; i<3; i++) cam[i] -= 0.1*up[i];
-		for (int i = 0; i<3; i++) center[i] -= 0.1*up[i];
-		break;
+		switch (codigo)
+		{
+		case GLUT_KEY_RIGHT:
+			for (int i = 0; i < 3; i++) cam[i] += 0.05*vr[i];
+			for (int i = 0; i < 3; i++) center[i] += 0.05*vr[i];
+			break;
+		case GLUT_KEY_LEFT:
+			for (int i = 0; i < 3; i++) cam[i] -= 0.05*vr[i];
+			for (int i = 0; i < 3; i++) center[i] -= 0.05*vr[i];
+			break;
+		case GLUT_KEY_UP:
+			for (int i = 0; i < 3; i++) cam[i] += 0.05*d[i];
+			for (int i = 0; i < 3; i++) center[i] += 0.05*d[i];
+			break;
+		case GLUT_KEY_DOWN:
+			for (int i = 0; i < 3; i++) cam[i] -= 0.05*d[i];
+			for (int i = 0; i < 3; i++) center[i] -= 0.05*d[i];
+			break;
+		case GLUT_KEY_PAGE_UP:
+			for (int i = 0; i < 3; i++) cam[i] += 0.05*up[i];
+			for (int i = 0; i < 3; i++) center[i] += 0.05*up[i];
+			break;
+		case GLUT_KEY_PAGE_DOWN:
+			for (int i = 0; i < 3; i++) cam[i] -= 0.05*up[i];
+			for (int i = 0; i < 3; i++) center[i] -= 0.05*up[i];
+			break;
+		}
+		updateVectors();
 	}
-		glutPostRedisplay();
 }
+
 void kP(unsigned char codigo, int x, int y)
 	{
-	float* newup;
-	float* d = subVectores(center, cam);
-	if (raio == -1)  raio = length(d);
-	normaliza(d);
-	vr = prodExterno(d, up);
-	normaliza(vr);
-
-
+	updateVectors();
 		switch(codigo)
 		{
 		case 'a':
-			alfa += incCamara;
-			center[0] = raio*sin(alfa);
-			center[2] = raio*cos(alfa);
+			if (mode == false){
+				alfa += incCamara;
+				center[0] = raio*sin(alfa);
+				center[2] = raio*cos(alfa);
+			}
 			break;
 		case 'd':
-			alfa -= incCamara;
-			center[0] = raio*sin(alfa);
-			center[2] = raio*cos(alfa);
+			if (mode == false) {
+				alfa -= incCamara;
+				center[0] = raio*sin(alfa);
+				center[2] = raio*cos(alfa);
+			}
 			break;
 		case 'b':
-			if (background == true) background = false;
-			else background = true;
+			(background == true) ? background = false : background = true;
 			break;
-		case 'f':
-
+		case 'r':
+			reset_view();
 			break;
-		case 'q':
-
+		case 'm':
+			if (mode == true)	{
+				mode = false; reset_view();
+			}
+			else { 
+				mode = true; reset_view();
+			}
 			break;
 		case 'e':
 
 			break;
 		case 'w':
-			delta += incCamara;
-			if (delta > (M_PI / 2.0f))
-				delta = (M_PI / 2.0f);
-			center[1] = raio*sin(delta);
-			//Actualiza up
-			newup = prodExterno(vr, d);
-			normaliza(newup);
-			for (int i = 0; i<3; i++) up[i] = newup[i];
+			if (mode == false) {
+				delta += incCamara;
+				if (delta > (M_PI / 2.0f))
+					delta = (M_PI / 2.0f);
+				center[1] = raio*sin(delta);
+
+				//float *newup = prodExterno(vr, d);
+				//normaliza(newup);
+				//for (int i = 0; i<3; i++) up[i] = newup[i];
+			}
 			break;
 		case 's':
-			delta -= incCamara;
-			if (delta < -(M_PI / 2.0f))
-				delta = -(M_PI / 2.0f);
-			center[1] = raio*sin(delta);
-			//Actualiza up
-			newup = prodExterno(vr, d);
-			normaliza(newup);
-			for (int i = 0; i<3; i++) up[i] = newup[i];
+			if (mode == false) {
+				delta -= incCamara;
+				if (delta < -(M_PI / 2.0f))
+					delta = -(M_PI / 2.0f);
+				center[1] = raio*sin(delta);
+
+
+				//float *newup = prodExterno(vr, d);
+				//normaliza(newup);
+				//for (int i = 0; i<3; i++) up[i] = newup[i];
+			}
 			break;
 		}
-		glutPostRedisplay();
+		updateVectors();
 	}
 
 void processMouseButtons(int button, int state, int xx, int yy)
 {
-	if (state == GLUT_DOWN)  {
-		startX = xx;
-		startY = yy;
-		if (button == GLUT_LEFT_BUTTON)
-			tracking = 1;
-		else if (button == GLUT_RIGHT_BUTTON)
-			tracking = 2;
-		else
-			tracking = 0;
-	}
-	else if (state == GLUT_UP) {
-		if (tracking == 1) {
-			alpha += (xx - startX);
-			beta += (yy - startY);
+	if (mode == true) {
+		if (state == GLUT_DOWN)  {
+			startX = xx;
+			startY = yy;
+			if (button == GLUT_LEFT_BUTTON)
+				tracking = 1;
+			else if (button == GLUT_RIGHT_BUTTON)
+				tracking = 2;
+			else
+				tracking = 0;
 		}
-		else if (tracking == 2) {
+		else if (state == GLUT_UP) {
+			if (tracking == 1) {
+				alpha += (xx - startX);
+				beta += (yy - startY);
+			}
+			else if (tracking == 2) {
 
-			r -= yy - startY;
-			if (r < 3)
-				r = 3.0;
+				r -= yy - startY;
+				if (r < 3)
+					r = 3.0;
+			}
+			tracking = 0;
 		}
-		tracking = 0;
 	}
 }
 
@@ -810,35 +847,37 @@ void processMouseMotion(int xx, int yy)
 	int alphaAux, betaAux;
 	int rAux;
 
-	if (!tracking)
-		return;
+	if (mode == true) {
+		if (!tracking)
+			return;
 
-	deltaX = xx - startX;
-	deltaY = yy - startY;
+		deltaX = xx - startX;
+		deltaY = yy - startY;
 
-	if (tracking == 1) {
+		if (tracking == 1) {
 
-		alphaAux = alpha + deltaX;
-		betaAux = beta + deltaY;
+			alphaAux = alpha + deltaX;
+			betaAux = beta + deltaY;
 
-		if (betaAux > 85.0)
-			betaAux = 85.0;
-		else if (betaAux < -85.0)
-			betaAux = -85.0;
+			if (betaAux > 85.0)
+				betaAux = 85.0;
+			else if (betaAux < -85.0)
+				betaAux = -85.0;
 
-		rAux = r;
+			rAux = r;
+		}
+		else if (tracking == 2) {
+
+			alphaAux = alpha;
+			betaAux = beta;
+			rAux = r - deltaY;
+			if (rAux < 3)
+				rAux = 3;
+		}
+		cam[0] = rAux * sin(alphaAux * 3.14 / 180.0) * cos(betaAux * 3.14 / 180.0);
+		cam[2] = rAux * cos(alphaAux * 3.14 / 180.0) * cos(betaAux * 3.14 / 180.0);
+		cam[1] = rAux *							     sin(betaAux * 3.14 / 180.0);
 	}
-	else if (tracking == 2) {
-
-		alphaAux = alpha;
-		betaAux = beta;
-		rAux = r - deltaY;
-		if (rAux < 3)
-			rAux = 3;
-	}
-	cam[0] = rAux * sin(alphaAux * 3.14 / 180.0) * cos(betaAux * 3.14 / 180.0);
-	cam[1] = rAux * cos(alphaAux * 3.14 / 180.0) * cos(betaAux * 3.14 / 180.0);
-	cam[2] = rAux *							     sin(betaAux * 3.14 / 180.0);
 }
 
 
@@ -854,7 +893,7 @@ void menu(int opcao) {
 			else tanslationLines = true;
 			break;
 		}
-		glutPostRedisplay();
+//		glutPostRedisplay();
 	}
 
 
@@ -877,18 +916,16 @@ void initGL() {
 }
 
 int main(int argc, char **argv) {
-	float a = 0;
-	float t = glutGet(GLUT_ELAPSED_TIME);
 
 
-// Aberta por default do ficheiro "ficheiro.xml" ou outro fornecido como parametro
+	// Abre por default o ficheiro "ficheiro.xml" ou outro fornecido como parametro
 	if (argc > 1)
 		file = argv[1];
 	else
 		file = "ficheiro.xml";
 
 
-// inicialização
+	// inicialização
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE|GLUT_RGBA);
 	int ww = (glutGet(GLUT_SCREEN_WIDTH) - wwidth) / 2;
@@ -898,44 +935,39 @@ int main(int argc, char **argv) {
 	glewInit();
 
 	
-//Inicia alguns settings OpenGL
+	//Inicia alguns settings OpenGL
 	initGL();
 
 
-// carrega o ficheiro para a estrutura
+	// carrega o ficheiro para a estrutura
 	readXml(file);
 
 
 	//carrega a textura de background
-	loadTexture((ILstring)"background3.jpg", textBackground);
+	loadTexture((ILstring)"background.jpg", textBackground);
+
+	// Inicia posição da câmara
+	reset_view();
 
 
 
-
-	a = glutGet(GLUT_ELAPSED_TIME) - t;
-	std::cout << "Leitura Xml - " << a/1000.0f << endl;
-//  converte cena em vbo e carrega para a placa gráfica
-	t = glutGet(GLUT_ELAPSED_TIME);
-
+	//  converte cena em vbo e carrega para a placa gráfica
 	iniciaVBO();
-	a = glutGet(GLUT_ELAPSED_TIME) - t;
-	std::cout << "Inicializacao vbo - " << a/1000.0f << endl;
 
-
-// registo de funções 
+	// registo de funções 
 	glutDisplayFunc(renderScene);
 	glutIdleFunc(renderScene);
 	glutReshapeFunc(changeSize);
 
-// pôr aqui registo da funções do teclado e rato
+	// pôr aqui registo da funções do teclado e rato
 	glutSpecialFunc(sK);
 	glutKeyboardFunc(kP);
 
-// pôr aqui registo da funções do rato
+	// pôr aqui registo da funções do rato
 	glutMouseFunc(processMouseButtons);
 	glutMotionFunc(processMouseMotion);
 
-// pôr aqui a criação do menu
+	// pôr aqui a criação do menu
 	int i = glutCreateMenu(menu);
 	glutAddMenuEntry("Exibir Linhas",1);
 	glutAddMenuEntry("Exibir Opaco",2);
@@ -945,7 +977,7 @@ int main(int argc, char **argv) {
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 	
-// entrar no ciclo do GLUT 
+	// entrar no ciclo do GLUT 
 	glutMainLoop();
 	
 

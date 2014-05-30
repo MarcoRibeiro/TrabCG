@@ -1,0 +1,118 @@
+<cena>
+	<luzes>
+		<luz tipo=POINT posX=0 posY=0 posZ=3/>
+	</luzes>
+	
+	<grupo><!-------heli------->
+		<rotacaoT tempo=15 eixoX=0 eixoY=-1 eixoZ=0 />
+		<escala X=0.5 Y=0.5 Z=0.5 />
+		<grupo><!-------corpo------->
+			<rotacao angulo=90 eixoX=1 eixoY=0 eixoZ=0 />
+			<escala X=1 Y=1.8 Z=1 />
+			<modelos>
+				<modelo ficheiro=esfera.txt textura=heli.jpg nome=corpo/>
+			</modelos>
+			
+		</grupo><!-------corpo------->
+		<grupo><!-------tras------->
+			<escala X=0.5 Y=0.5 Z=0.5 />
+			<rotacao angulo=-90 eixoX=1 eixoY=0 eixoZ=0 />
+			<translacao Y=4.5 />
+			<escala X=1 Y=10 Z=1 />
+			<modelos>
+				<modelo ficheiro=cone.txt textura=metal.jpg/>
+			</modelos>
+			<grupo><!-------asa------->
+				<rotacao angulo=90 eixoX=0 eixoY=0 eixoZ=1 />
+				<translacao X=0.4 Y=0.8 />
+				<escala X=0.1 Y=1.5 Z=0.1 />
+				<modelos>
+					<modelo ficheiro=piramide.txt textura=metal.jpg nome=asa/>
+				</modelos>
+			</grupo><!-------asa------->
+			<grupo><!-------asa------->
+				<rotacao angulo=-90 eixoX=0 eixoY=0 eixoZ=1 />
+				<translacao X=-0.4 Y=0.8  />
+				<escala X=0.1 Y=1.5 Z=0.1 />
+				<modelos>
+					<modelo ficheiro=piramide.txt textura=metal.jpg nome=asa/>
+				</modelos>
+			</grupo><!-------asa------->
+			<grupo><!-------asa------->
+				<rotacao angulo=90 eixoX=1 eixoY=0 eixoZ=0 />
+				<translacao Y=0.8 Z=-0.4 />
+				<escala X=0.1 Y=1.7 Z=0.1 />
+				<modelos>
+					<modelo ficheiro=piramide.txt textura=metal.jpg nome=asa/>
+				</modelos>
+			</grupo><!-------asa------->
+		</grupo><!-------tras------->
+		<grupo>
+				<translacao X=0.2 Y=-1 />
+				<rotacao angulo=45 eixoX=0 eixoY=0 eixoZ=1 />
+				
+				<escala X=0.07 Y=1.3 Z=0.07 />
+				<modelos>
+					<modelo ficheiro=cilindro.txt textura=metal.jpg/>
+				</modelos>
+			</grupo>
+		<grupo><!------motor------->
+				<rotacao angulo=90 eixoX=1 eixoY=0 eixoZ=0 />
+				<translacao X=-0.65 Z=1.5 />
+				<escala X=0.1 Y=1.5 Z=0.1 />
+				<modelos>
+					<modelo ficheiro=cilindro.txt textura=metal.jpg/>
+				</modelos>
+		</grupo><!-------motor------->
+		<grupo>
+				<translacao X=-0.2 Y=-1 />
+				<rotacao angulo=-45 eixoX=0 eixoY=0 eixoZ=1 textura=metal.jpg/>
+				<escala X=0.07 Y=1.3 Z=0.07 />
+				<modelos>
+					<modelo ficheiro=cilindro.txt textura=metal.jpg/>
+				</modelos>
+			</grupo>
+		<grupo><!------motor------->
+				<rotacao angulo=90 eixoX=1 eixoY=0 eixoZ=0 textura=metal.jpg/>
+				<translacao X=0.65 Z=1.5 />
+				<escala X=0.1 Y=1.5 Z=0.1 />
+				<modelos>
+					<modelo ficheiro=cilindro.txt textura=metal.jpg/>
+				</modelos>
+		</grupo><!-------motor------->
+		<grupo><!------------->
+				
+				<translacao Y=1 />
+				
+			<grupo>
+				<escala X=0.1 Y=0.5 Z=0.1 />
+				<modelos>
+					<modelo ficheiro=cilindro.txt textura=metal.jpg/>
+				</modelos>
+			</grupo>
+			<rotacao angulo=90 eixoX=1 eixoY=0 eixoZ=0 />
+			<rotacaoT tempo=1 eixoX=0 eixoY=0 eixoZ=1 />
+			<grupo>
+					
+					<translacao Z=-0.3 />
+					<escala X=0.2 Y=4.5 Z=0.1 />
+					<modelos>
+						<modelo ficheiro=cilindro.txt textura=metal.jpg/>
+					</modelos>
+					
+			</grupo>
+			<rotacao angulo=90 eixoX=0 eixoY=0 eixoZ=1 />
+			<grupo>
+					<translacao Z=-0.3 />
+					<escala X=0.2 Y=4.5 Z=0.1 />
+					<modelos>
+						<modelo ficheiro=cilindro.txt textura=metal.jpg/>
+					</modelos>
+					
+			</grupo>
+			<rotacaoT tempo=1 eixoX=0 eixoY=0 eixoZ=-1 />
+		</grupo><!-------------->
+		
+	</grupo><!-------heli------->
+
+</cena>		

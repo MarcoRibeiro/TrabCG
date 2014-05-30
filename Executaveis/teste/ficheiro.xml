@@ -1,0 +1,27 @@
+<cena>
+	<luzes>
+		<luz tipo=POINT posX=0 posY=0 posZ=3/>
+	</luzes>
+	
+			<grupo>
+					
+					<modelos>
+						<modelo ficheiro=cilindro.txt textura=cilindro.jpg/>
+						
+					</modelos>
+					
+			</grupo>
+			<grupo>
+						<translacao X=3.5 />
+					<modelos>
+						
+						<modelo ficheiro=cilindro2.txt textura=cilindro.jpg/>
+					</modelos>
+					
+			</grupo>
+		
+		</grupo><!-------------->
+		
+
+
+</cena>		
