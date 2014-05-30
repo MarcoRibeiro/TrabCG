@@ -43,16 +43,22 @@ int w = 70, h = 70; // usado para setOrthographicProjection
 float alfa = -M_PI;  
 float delta = 0;
 float raio = -1;
+float* vr;
+float incCamara = (2 * M_PI) / 200; //incremento de movimento da camara
+
+float cam[] = { 0.0f, 0.0f, 4.0f };
+float center[] = { 0.0f, 0.0f, 0.0f };
+float up[] = { 0.0f, 1.0f, 0.0f };
 
 //MOVIMENTO CAMARA
-float centerX = 0.0f, centerY = 0.0f, centerZ = 0.0f;
-float upX = 0.0f, upY = 1.0f, upZ = 0.0f;
+//float centerX = 0.0f, centerY = 0.0f, centerZ = 0.0f;
+//float upX = 0.0f, upY = 1.0f, upZ = 0.0f;
 
 //MOVIMENTO DO RATO
-float camX = 0, camY=0, camZ = 5;
+//float camX = 0, camY=0, camZ = 4;
 
 int startX, startY, tracking = 0;
-int alpha = 0, beta = 0, r = 5;
+int alpha = 0, beta = 0, r = 4;
 
 
 // TAMANHO DA JANELA
@@ -542,13 +548,24 @@ void changeSize(int w, int h) {
 }
 
 
-float* getPontoD(float* l, float* p)
+float* subVectores(float* l, float* p)
 {
 	float *res = (float*)malloc(sizeof(float)* 3); // resultado
 	res[0] = l[0] - p[0];
 	res[1] = l[1] - p[1];
 	res[2] = l[2] - p[2];
 	return res;
+}
+
+float length(float* v)
+{
+	return sqrt(pow(v[0], 2) + pow(v[1], 2) + pow(v[2], 2));
+}
+
+void normaliza(float *v)
+{
+	float l = length(v);
+	for(int i=0;i<3;i++)	v[i] = v[i] / l;
 }
 
 float* prodExterno(float* va, float* vb) {
@@ -608,6 +625,7 @@ void drawLights(vector<light*> luzes)
 		glLightfv(light0, (*it._Ptr)->getType(), (*it._Ptr)->getColor());
 		light0++;
 	}
+	
 }
 
 void renderScene(void) {
@@ -625,28 +643,19 @@ void renderScene(void) {
 
 	// set the camera
 	glLoadIdentity();
-	gluLookAt(camX, camY, camZ,
-		centerX, centerY, centerZ,
-		upX, upY, upZ);
+	gluLookAt(cam[0], cam[1], cam[2],
+		center[0], center[1], center[2],
+		up[0], up[1], up[2]);
+
 
 	//Coloca luzes
 	vector<light*>luzes = c.getLights();
-	if ((luzes.size() != 0) && (lights_on == false)) {
-		drawLights(luzes); lights_on = true;
-	}
-	
+	if (luzes.size() != 0) drawLights(luzes);
+
 
 	//Desenha cena
 	drawCenaVBO(c);
 
-//	glEnable(GL_LIGHT0);
-//GLfloat diff[3] = { 1.0, 0.0, 0.0 };
-//	GLfloat p[] = { 0, 0, 0, 1 };
-//	glLightfv(GL_LIGHT0, GL_POSITION, p);
-
-	//glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);
-
-	//glutSolidSphere(1,10,10);
 
 	// Rato
 	switch (linhas) {
@@ -674,87 +683,62 @@ void renderScene(void) {
 
 void sK(int codigo, int x, int y){
 
-	float* d;
-	float p[3] = { camX, camY, camZ };
-	float l[3] = { centerX, centerY, centerZ };
-	float up[3] = { upX, upY, upZ };
-	d = getPontoD(l, p);
-	
-	float *vr = prodExterno(d, up);
+	float *d = subVectores(center, cam);
+	normaliza(d);
+	vr = prodExterno(d, up);
+	normaliza(vr);
 
 	switch (codigo)
 	{
-
+		
 	case GLUT_KEY_RIGHT:
-		camX += 0.015*vr[0];
-		camY += 0.015*vr[1];
-		camZ += 0.015*vr[2];
-		centerX += 0.015*vr[0];
-		centerY += 0.015*vr[1];
-		centerZ += 0.015*vr[2];
+		for(int i=0; i<3; i++) cam[i] += 0.1*vr[i];
+		for (int i = 0; i<3; i++) center[i] += 0.1*vr[i];
 		break;
 	case GLUT_KEY_LEFT:
-		camX -=	0.015*vr[0];
-		camY -= 0.015*vr[1];
-		camZ -= 0.015*vr[2];
-		centerX -= 0.015*vr[0];
-		centerY -= 0.015*vr[1];
-		centerZ -= 0.015*vr[2];
+		for (int i = 0; i<3; i++) cam[i] -= 0.1*vr[i];
+		for (int i = 0; i<3; i++) center[i] -= 0.1*vr[i];
 		break;
 	case GLUT_KEY_UP:
-		camX += 0.015*d[0];
-		camY += 0.015*d[1];
-		camZ += 0.015*d[2];
-		centerX += 0.015*d[0];
-		centerY += 0.015*d[1];
-		centerZ += 0.015*d[2];
+		for (int i = 0; i<3; i++) cam[i] += 0.1*d[i];
+		for (int i = 0; i<3; i++) center[i] += 0.1*d[i];
 		break;
 	case GLUT_KEY_DOWN:
-		camX -= 0.015*d[0];
-		camY -= 0.015*d[1];
-		camZ -= 0.015*d[2];
-		centerX -= 0.015*d[0];
-		centerY -= 0.015*d[1];
-		centerZ -= 0.015*d[2];
+		for (int i = 0; i<3; i++) cam[i] -= 0.1*d[i];
+		for (int i = 0; i<3; i++) center[i] -= 0.1*d[i];
 		break;
 	case GLUT_KEY_PAGE_UP:
-		camX += 0.015*up[0];
-		camY += 0.015*up[1];
-		camZ += 0.015*up[2];
-		centerX += 0.015*up[0];
-		centerY += 0.015*up[1];
-		centerZ += 0.015*up[2];
+		for (int i = 0; i<3; i++) cam[i] += 0.015*up[i];
+		for (int i = 0; i<3; i++) center[i] += 0.015*up[i];
 		break;
 	case GLUT_KEY_PAGE_DOWN:
-		camX -= 0.015*up[0];
-		camY -= 0.015*up[1];
-		camZ -= 0.015*up[2];
-		centerX -= 0.015*up[0];
-		centerY -= 0.015*up[1];
-		centerZ -= 0.015*up[2];
+		for (int i = 0; i<3; i++) cam[i] -= 0.015*up[i];
+		for (int i = 0; i<3; i++) center[i] -= 0.015*up[i];
 		break;
 	}
 		glutPostRedisplay();
 }
 void kP(unsigned char codigo, int x, int y)
 	{
-	float p[3] = { camX, camY, camZ };
-	float l[3] = { centerX, centerY, centerZ };
-	float up[3] = { upX, upY, upZ };
-	float* d = getPontoD(l, p);
-	if(raio == -1)  raio = sqrt(pow(d[0], 2) + pow(d[1], 2) + pow(d[2], 2));
-	float inc = (2 * M_PI) / 200;
+	float* newup;
+	float* d = subVectores(center, cam);
+	if (raio == -1)  raio = length(d);
+	normaliza(d);
+	vr = prodExterno(d, up);
+	normaliza(vr);
+
+
 		switch(codigo)
 		{
 		case 'a':
-			alfa += inc;
-			centerX = raio*sin(alfa);
-			centerZ = raio*cos(alfa);
+			alfa += incCamara;
+			center[0] = raio*sin(alfa);
+			center[2] = raio*cos(alfa);
 			break;
 		case 'd':
-			alfa -= inc;
-			centerX = raio*sin(alfa);
-			centerZ = raio*cos(alfa);
+			alfa -= incCamara;
+			center[0] = raio*sin(alfa);
+			center[2] = raio*cos(alfa);
 			break;
 		case 'b':
 			if (background == true) background = false;
@@ -770,17 +754,24 @@ void kP(unsigned char codigo, int x, int y)
 
 			break;
 		case 'w':
-			delta += inc;
+			delta += incCamara;
 			if (delta > (M_PI / 2.0f))
 				delta = (M_PI / 2.0f);
-			centerY = raio*sin(delta);
+			center[1] = raio*sin(delta);
+			//Actualiza up
+			newup = prodExterno(vr, d);
+			normaliza(newup);
+			for (int i = 0; i<3; i++) up[i] = newup[i];
 			break;
 		case 's':
-			delta -= inc;
+			delta -= incCamara;
 			if (delta < -(M_PI / 2.0f))
 				delta = -(M_PI / 2.0f);
-			centerY = raio*sin(delta);
-
+			center[1] = raio*sin(delta);
+			//Actualiza up
+			newup = prodExterno(vr, d);
+			normaliza(newup);
+			for (int i = 0; i<3; i++) up[i] = newup[i];
 			break;
 		}
 		glutPostRedisplay();
@@ -845,9 +836,9 @@ void processMouseMotion(int xx, int yy)
 		if (rAux < 3)
 			rAux = 3;
 	}
-	camX = rAux * sin(alphaAux * 3.14 / 180.0) * cos(betaAux * 3.14 / 180.0);
-	camZ = rAux * cos(alphaAux * 3.14 / 180.0) * cos(betaAux * 3.14 / 180.0);
-	camY = rAux *							     sin(betaAux * 3.14 / 180.0);
+	cam[0] = rAux * sin(alphaAux * 3.14 / 180.0) * cos(betaAux * 3.14 / 180.0);
+	cam[1] = rAux * cos(alphaAux * 3.14 / 180.0) * cos(betaAux * 3.14 / 180.0);
+	cam[2] = rAux *							     sin(betaAux * 3.14 / 180.0);
 }
 
 
