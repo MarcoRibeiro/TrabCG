@@ -44,9 +44,9 @@ float alfa = -M_PI;
 float delta = 0;
 float raio = -1;
 float* vr;
-float incCamara = (2 * M_PI) / 200; //incremento de movimento da camara
+float incCamara = (2 * M_PI) / 50; //incremento de movimento da camara
 
-float cam[] = { 0.0f, 0.0f, 4.0f };
+float cam[] = { 0.0f, 0.0f, 5.0f };
 float center[] = { 0.0f, 0.0f, 0.0f };
 float up[] = { 0.0f, 1.0f, 0.0f };
 
@@ -58,7 +58,7 @@ float up[] = { 0.0f, 1.0f, 0.0f };
 //float camX = 0, camY=0, camZ = 4;
 
 int startX, startY, tracking = 0;
-int alpha = 0, beta = 0, r = 4;
+int alpha = 0, beta = 0, r = 5;
 
 
 // TAMANHO DA JANELA
@@ -708,12 +708,12 @@ void sK(int codigo, int x, int y){
 		for (int i = 0; i<3; i++) center[i] -= 0.1*d[i];
 		break;
 	case GLUT_KEY_PAGE_UP:
-		for (int i = 0; i<3; i++) cam[i] += 0.015*up[i];
-		for (int i = 0; i<3; i++) center[i] += 0.015*up[i];
+		for (int i = 0; i<3; i++) cam[i] += 0.1*up[i];
+		for (int i = 0; i<3; i++) center[i] += 0.1*up[i];
 		break;
 	case GLUT_KEY_PAGE_DOWN:
-		for (int i = 0; i<3; i++) cam[i] -= 0.015*up[i];
-		for (int i = 0; i<3; i++) center[i] -= 0.015*up[i];
+		for (int i = 0; i<3; i++) cam[i] -= 0.1*up[i];
+		for (int i = 0; i<3; i++) center[i] -= 0.1*up[i];
 		break;
 	}
 		glutPostRedisplay();
@@ -907,7 +907,7 @@ int main(int argc, char **argv) {
 
 
 	//carrega a textura de background
-	loadTexture((ILstring)"background.jpg", textBackground);
+	loadTexture((ILstring)"background3.jpg", textBackground);
 
 
 

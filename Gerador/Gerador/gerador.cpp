@@ -25,6 +25,7 @@ primitiveVBO drawPlane(float largura, float comprimento)
 
 	return p;
 }
+
 primitiveVBO drawRectangule( float comprimento, float largura, float altura)  //Paralelipipedo
 {
 	primitiveVBO p;
@@ -64,38 +65,72 @@ primitiveVBO drawCube(float size) {
 primitiveVBO drawCilinder(float n_lados, float altura, float raio)
 {
 	primitiveVBO p;
+
+	float incTampaCimaX = 0.4375;
+	float incTampaCimaY = 0.1875;
+	float incTampaBaixoX = 0.8125;
+	float incTampaBaixoY = 0.1875;
+
+	float incCorpoCimaY = 1.0f;
+	float incCorpoBaixo = 0.375f;
+
+	float raioTampaCilindro = 0.623 - 0.4375;
+	float incremento = 1.0f / n_lados;
+
 	float delta = 2 * PI / n_lados;
 	int j = 10; //numero de pontos por ciclos
 	int inc = 0;
+
 	for (int i = 0; i < n_lados; i++) {
 
 		inc=j*i;
 		
 		//topo   OT, PT, QT
-		vertex p0(0, altura / 2, 0); p0.setNormal(0.0f, 1.0f, 0.0f); //OT
+		vertex p0(0, altura / 2, 0); p0.setNormal(0.0f, 1.0f, 0.0f);//OT
+		p0.setText2D(incTampaCimaX, incTampaCimaY);
+
 		vertex p1(raio*sin(delta*i), altura / 2, raio*cos(delta*i)); p1.setNormal(0.0f, 1.0f, 0.0f);//PT
+		p1.setText2D(incTampaCimaX - raioTampaCilindro*sin(i*delta), incTampaCimaY - raioTampaCilindro*cos(i*delta));
+
 		vertex p2(raio*sin(delta*(i + 1)), altura / 2, raio*cos(delta*(i + 1))); p2.setNormal(0.0f, 1.0f, 0.0f);  //QT
+		p2.setText2D(incTampaCimaX - raioTampaCilindro*sin((i + 1)*delta), incTampaCimaY - raioTampaCilindro*cos((i + 1)*delta));
 
 		//corpo P, P', Q | Q, P', Q'
-		vertex p3(raio*sin(delta*i), altura / 2, raio*cos(delta*i)); p3.setNormal(sin(delta*i), 0.0f, cos(delta*i));//P
-		vertex p4(raio*sin(delta*i), -altura / 2, raio*cos(delta*i)); p4.setNormal(sin(delta*i), 0.0f, cos(delta*i)); //P'
-		vertex p5(raio*sin(delta*(i + 1)), altura / 2, raio*cos(delta*(i + 1))); p5.setNormal(sin(delta*(i + 1)), 0.0f, cos(delta*(i + 1)));  //Q
+		
+		vertex p3(raio*sin(delta*(i + 1)), altura / 2, raio*cos(delta*(i + 1))); p3.setNormal(sin(delta*(i + 1)), 0.0f, cos(delta*(i + 1)));  //Q
+		p3.setText2D((i + 1)*incremento, incCorpoCimaY);
+
+		vertex p4(raio*sin(delta*i), altura / 2, raio*cos(delta*i)); p4.setNormal(sin(delta*i), 0.0f, cos(delta*i));//P
+		p4.setText2D(i*incremento, incCorpoCimaY);
+
+
+		vertex p5(raio*sin(delta*i), -altura / 2, raio*cos(delta*i)); p5.setNormal(sin(delta*i), 0.0f, cos(delta*i)); //P'
+		p5.setText2D(i*incremento, incCorpoBaixo);
+
+
 		vertex p6(raio*sin(delta*(i + 1)), -altura / 2, raio*cos(delta*(i + 1))); p6.setNormal(sin(delta*(i + 1)), 0, cos(delta*(i + 1)));  // Q'
+		p6.setText2D((i + 1)*incremento, incCorpoBaixo);
+
+
 
 		//base O'B, P'B, Q'B
 		vertex p7(0, -altura / 2, 0); p7.setNormal(0.0f, -1.0f, 0.0f);  // O'B
-		vertex p8(raio*sin(delta*i), -altura / 2, raio*cos(delta*i)); p8.setNormal(0.0f, -1.0f, 0.0f); //P'B
-		vertex p9(raio*sin(delta*(i + 1)), -altura / 2, raio*cos(delta*(i + 1))); p9.setNormal(0.0f, -1.0f, 0.0f);  // Q'B
-		
+		p7.setText2D(incTampaBaixoX, incTampaBaixoY);
 
+		vertex p8(raio*sin(delta*i), -altura / 2, raio*cos(delta*i)); p8.setNormal(0.0f, -1.0f, 0.0f); //P'B
+		p8.setText2D(incTampaBaixoX - raioTampaCilindro*sin(i*delta), incTampaBaixoY - raioTampaCilindro*cos(i*delta));
+
+		vertex p9(raio*sin(delta*(i + 1)), -altura / 2, raio*cos(delta*(i + 1))); p9.setNormal(0.0f, -1.0f, 0.0f);  // Q'B
+		p9.setText2D(incTampaBaixoX - raioTampaCilindro*sin((i + 1)*delta), incTampaBaixoY - raioTampaCilindro*cos((i + 1)*delta));
+		
 
 		p.addPonto(p0); p.addPonto(p1); p.addPonto(p2);	p.addPonto(p3); p.addPonto(p4);
 		p.addPonto(p5); p.addPonto(p6); p.addPonto(p7); p.addPonto(p8); p.addPonto(p9);
 
 		p.addTriangulo(inc + 0, inc + 1, inc + 2);
 		p.addTriangulo(inc + 3, inc + 4, inc + 5);
-		p.addTriangulo(inc + 5, inc + 4, inc + 6);
-		p.addTriangulo(inc + 7, inc + 8, inc + 9);
+		p.addTriangulo(inc + 6, inc + 3, inc + 5);
+		p.addTriangulo(inc + 7, inc + 9, inc + 8);
 
 	}
 	return p;
