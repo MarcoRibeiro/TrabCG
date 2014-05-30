@@ -4,7 +4,7 @@
 </luzes>
 <grupo>
 <modelos>
-<modelo ficheiro=cilindro.txt diffR=1 diffG=1 diffB=1 textura=Oil_Drum001h.jpg  />
+<modelo ficheiro=cone.txt diffR=1 diffG=1 diffB=1 textura=relva1.jpg  />
 </modelos>
 </grupo>
 </cena>		

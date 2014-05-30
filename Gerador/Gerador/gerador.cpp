@@ -200,8 +200,20 @@ primitiveVBO drawDisc(float raioInt, float raioExt, float tesselacao)
 }
 primitiveVBO drawCone(float n_lados, float altura, float raio)
 {
+
+	float incTampaCimaX = 0.4375;
+	float incTampaCimaY = 0.1875;
+	float incTampaBaixoX = 0.8125;
+	float incTampaBaixoY = 0.1875;
+
+	float incCorpoCimaY = 1.0f;
+	float incCorpoBaixo = 0.375f;
+
+	float raioTampaCilindro = 0.623 - 0.4375;
+	float incremento = 1.0f / n_lados;
+
 	primitiveVBO p;
-	int nindices = 4;   //numero de indices adicionados por ciclo
+	int nindices = 6;   //numero de indices adicionados por ciclo
 	int inc = 0;
 	int h = 0;
 
@@ -210,21 +222,31 @@ primitiveVBO drawCone(float n_lados, float altura, float raio)
 
 		inc = nindices*h;
 
-
-
-		// O Q P
+		// O Q P  BASE
 		vertex p0(0, -altura / 2, 0); p0.setNormal(0.0f, 1.0f, 0.0f); //O
+		p0.setText2D(incTampaBaixoX, incTampaBaixoY);
+
 		vertex p1(raio*sin((delta)*(count + 1)), -altura / 2, raio*cos((delta)*(count + 1))); p1.setNormal(sin(delta*(count + 1)), 0.0f, cos(delta*(count + 1))); //Q
+		p1.setText2D(incTampaBaixoX - raioTampaCilindro*sin((count + 1)*delta), incTampaBaixoY - raioTampaCilindro*cos((count + 1)*delta));
+
 		vertex p2(raio*sin((delta)*(count)), -altura / 2, raio*cos((delta)*(count))); p2.setNormal(sin(delta*(count)), 0.0f, cos(delta*(count)));  //P
+		p2.setText2D(incTampaBaixoX - raioTampaCilindro*sin(count*delta), incTampaBaixoY - raioTampaCilindro*cos(count*delta));
 
-		// O' P Q
+		// O' P Q CORPO
 		vertex p3(0, altura / 2, 0); p3.setNormal(0.0f, 1.0f, 0.0f);  //O'
+		p3.setText2D(0.5f, incCorpoCimaY);
 
+		vertex p4(raio*sin((delta)*(count)), -altura / 2, raio*cos((delta)*(count))); p4.setNormal(sin(delta*(count)), 0.0f, cos(delta*(count)));  //P
+		p4.setText2D(count*incremento, incCorpoBaixo);
 
-		p.addPonto(p0); p.addPonto(p1); p.addPonto(p2);	p.addPonto(p3); 
+		vertex p5(raio*sin((delta)*(count + 1)), -altura / 2, raio*cos((delta)*(count + 1))); p5.setNormal(sin(delta*(count + 1)), 0.0f, cos(delta*(count + 1))); //Q
+		p5.setText2D((count+1)*incremento, incCorpoBaixo);
+
+		p.addPonto(p0); p.addPonto(p1); p.addPonto(p2);	
+		p.addPonto(p3); p.addPonto(p4); p.addPonto(p5);
 
 		p.addTriangulo(inc+0, inc+1, inc+2);
-		p.addTriangulo(inc+3, inc+2, inc+1);
+		p.addTriangulo(inc+3, inc+4, inc+5);
 
 		h++;
 	}
